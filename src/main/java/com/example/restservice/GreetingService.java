@@ -11,7 +11,7 @@ public class GreetingService {
     @Autowired
     private GreetingRepository greetingRepository;
 
-    public Greeting getGreeting(String name, List<String> language) {
-        return greetingRepository.storeGreeting(name, language);
+    public List<Greeting> getGreeting(String name, List<String> languages) {
+        return greetingRepository.storeGreeting(name, languages);
     }
 }

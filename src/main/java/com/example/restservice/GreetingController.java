@@ -14,7 +14,7 @@ public class GreetingController {
 	private GreetingService greetingService;
 
 	@GetMapping("/greeting")
-	public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name, @RequestParam(value = "", defaultValue = "") List<String> language) {
-		return greetingService.getGreeting(name, language);
+	public List<Greeting> greeting(@RequestParam(value = "name", defaultValue = "World") String name, @RequestParam(value = "", defaultValue = "") List<String> languages) {
+		return greetingService.getGreeting(name, languages);
 	}
 }
