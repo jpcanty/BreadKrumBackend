@@ -51,7 +51,7 @@ public class GreetingRepository {
         String response = restClient.post()
           .uri("https://translation.googleapis.com/language/translate/v2")
           .body(Map.of("q", List.of(q), "target", language))
-          .header("Authorization", "Bearer ya29.a0AXeO80TU9hKZNosC6KdpigdtH1FZ71F9NatT0vRvjWtAoKNb8FhkkcGGZrmyQCjhK40cJb1wujgKC9_2_RNoBGPaDih8JSVLH9GaJn4SP74E1j5teux6JpRJmHv_3ZatKNKdeDBwXx8S8HPqR917WtohWVeEDfhtNJWe3Z7I3t4XZQaCgYKAX8SARESFQHGX2MiL4RKj55PYs2rFEVtM3O-Aw0181")
+          .header("Authorization", "Bearer ya29.a0AXeO80SAda-WXDlLtJxuceTod-9w4_NomPUzQGpzfwFQqQvKCrHSaHOXsSD494XvWDQiSZijm5tmOFxX641UqdwSgL1E2qEdsnash1q9yQQeLVGYu8JUKvLx3eupxEIObMcdO1GFqdd0af2Lt60dxW9_lq_PD48I0E1XbrEq5mdZ0VsaCgYKAQYSARESFQHGX2Miwp_Z6KeITCXYF_wKwY-4ww0182")
           .header("x-goog-user-project", "astute-asset-450607-p5")
           .header("Content-Type", "application/json")
           .header("charset", "utf-8")
