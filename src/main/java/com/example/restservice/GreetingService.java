@@ -12,6 +12,7 @@ public class GreetingService {
     private GreetingRepository greetingRepository;
 
     public List<Greeting> getGreeting(String name, List<String> languages) {
+        //Called the Greeting Repo
         return greetingRepository.storeGreeting(name, languages);
     }
 }

@@ -20,10 +20,12 @@ public class GreetingRepository {
     private final ObjectMapper objectMapper;
 
     public GreetingRepository() {
+        //Rest Client is used to make GET, POST request to external APIs 
         this.restClient = RestClient.builder().build();
         this.objectMapper = new ObjectMapper();
     }
 
+    //This is used to get the Google Translate API
     public List<Greeting> storeGreeting(String name, List<String> languages) {
         return languages.stream()
                     .map(language -> getTranslation(name, language))
