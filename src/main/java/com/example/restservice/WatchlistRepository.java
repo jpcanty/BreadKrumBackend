@@ -25,9 +25,9 @@ public class WatchlistRepository {
     this.objectMapper = mapper;
    }
 
-   public Watchlist getWatchlistById() throws JsonMappingException, JsonProcessingException {
+   public Watchlist getWatchlistById(String id) throws JsonMappingException, JsonProcessingException {
       String response = restClient.get()
-      .uri(BASE_URL)
+      .uri(BASE_URL + "/" + id)
     .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
     .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
     .retrieve()

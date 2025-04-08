@@ -24,4 +24,17 @@ public class WatchlistService {
         }
         return List.of();
     }
+
+    public Watchlist getWatchlistById(String id) {
+        try {
+            return watchlistRepository.getWatchlistById(id);
+        }
+
+        catch(JsonProcessingException e) {
+            System.out.println("Unable to get watchlist with that id");
+            System.out.println(e);
+        }
+        
+        return new Watchlist(null, null, null);
+    }
 }
