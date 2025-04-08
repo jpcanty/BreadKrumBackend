@@ -35,6 +35,6 @@ public class WatchlistService {
             System.out.println(e);
         }
         
-        return new Watchlist(null, null, null);
+        return new Watchlist(null, null, null, null);
     }
 }

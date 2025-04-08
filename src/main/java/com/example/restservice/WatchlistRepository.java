@@ -33,6 +33,7 @@ public class WatchlistRepository {
     .retrieve()
     .body(String.class);
 
+   //  System.out.println(response);
     return objectMapper.readValue(response, Watchlist.class);
    }
 
@@ -43,6 +44,8 @@ public class WatchlistRepository {
     .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
     .retrieve()
     .body(String.class);
+
+    // TODO: refactor so assets only returns for getWatchlistById. assets return null when calling this endpoint as not included in API endpoint 
 
    //  System.out.println(response);
    // [{watchlist1, watchlist2}] <- correct
