@@ -1,6 +1,9 @@
 package com.example.restservice;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import org.springframework.web.client.RestClient;
@@ -52,5 +55,14 @@ public class WatchlistRepository {
    // {watchlists: [{watchlist1, watchlist2}]} <- incorrect
    // Watchlist[] myObjects = mapper.readValue(json, Watchlist[].class);
    return objectMapper.readValue(response, Watchlist[].class);
+   }
+
+   public ResponseEntity<Void> postWatchlist(Watchlist watchlist) {
+      return restClient.post()
+      .uri("https://parseapi.back4app.com/classes/Watchlist2")
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(Map.of("name", watchlist.name(), "assets", watchlist.assets()))
+      .retrieve()
+      .toBodilessEntity();
    }
 }
