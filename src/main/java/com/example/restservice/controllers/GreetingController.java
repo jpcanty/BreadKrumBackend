@@ -1,4 +1,4 @@
-package com.example.restservice;
+package com.example.restservice.controllers;
 
 import java.util.List;
 
@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.restservice.models.Greeting;
+import com.example.restservice.services.GreetingService;
 
 @RestController
 public class GreetingController {

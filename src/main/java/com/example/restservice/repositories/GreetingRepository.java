@@ -1,4 +1,4 @@
-package com.example.restservice;
+package com.example.restservice.repositories;
 
 import java.util.List;
 import java.util.Map;
@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClient;
 
+import com.example.restservice.models.Greeting;
+import com.example.restservice.models.TranslationResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

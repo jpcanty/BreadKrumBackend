@@ -1,4 +1,4 @@
-package com.example.restservice;
+package com.example.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.example.restservice.models.Watchlist;
+import com.example.restservice.repositories.WatchlistRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

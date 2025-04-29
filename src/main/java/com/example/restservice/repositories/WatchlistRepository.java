@@ -1,4 +1,4 @@
-package com.example.restservice;
+package com.example.restservice.repositories;
 import java.util.Map;
 
 import org.springframework.http.MediaType;
@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import org.springframework.web.client.RestClient;
 
+import com.example.restservice.models.Watchlist;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;

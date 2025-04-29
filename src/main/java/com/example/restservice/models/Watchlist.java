@@ -1,4 +1,4 @@
-package com.example.restservice;
+package com.example.restservice.models;
 import java.util.List;
 // add assets in record, it's type is array that returns list of objects 
 // nested types 

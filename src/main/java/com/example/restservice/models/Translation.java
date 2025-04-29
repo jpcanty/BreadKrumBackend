@@ -1,4 +1,4 @@
-package com.example.restservice;
+package com.example.restservice.models;
 
 public class Translation {
     private String translatedText;
