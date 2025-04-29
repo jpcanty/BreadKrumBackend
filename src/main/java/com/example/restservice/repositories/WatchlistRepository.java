@@ -1,5 +1,6 @@
 package com.example.restservice.repositories;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,4 +70,35 @@ public class WatchlistRepository {
       .retrieve()
       .toBodilessEntity();
    }
+
+   public CompletableFuture<ResponseEntity<Void>> postWatchlistFuture(Watchlist watchlist) {
+      return CompletableFuture.supplyAsync(() -> {
+           return restClient.post()
+      .uri("https://parseapi.back4app.com/classes/Watchlist2")
+      .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
+      .header("X-Parse-REST-API-Key",BACK_4_APP_REST_API_KEY)
+      .contentType(MediaType.APPLICATION_JSON)
+      .body(Map.of("name", watchlist.name(), "assets", watchlist.assets()))
+      .retrieve()
+      .toBodilessEntity();
+      });
+   }
+
+   public CompletableFuture<Watchlist[]> getAllWatchlistsFuture() {
+    return CompletableFuture.supplyAsync(() -> {
+        try {
+            String response = restClient.get()
+                .uri(BASE_URL)
+                .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
+                .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
+                .retrieve()
+                .body(String.class);
+
+            // Deserialize the response into Watchlist[]
+            return objectMapper.readValue(response, Watchlist[].class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to process JSON response", e);
+        }
+    });
+}
 }

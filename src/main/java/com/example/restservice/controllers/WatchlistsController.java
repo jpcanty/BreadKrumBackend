@@ -35,9 +35,13 @@ public class WatchlistsController {
     }
     
     //posting watchlist to the frontend use  ObjectMapper objectMapper turns string to object
-    @PostMapping("/watchlists")
+    @PostMapping("/watchlist")
     public String postWatchlist(@RequestBody String entity) {
         return watchlistService.postWatchlist(entity);
     }
     
+    @PostMapping("/watchlists")
+    public void postWatchlists() {
+        watchlistService.postAllWatchlists();
+    }
 }
