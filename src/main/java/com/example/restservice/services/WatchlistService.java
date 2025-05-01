@@ -71,11 +71,16 @@ public class WatchlistService {
     public void postAllWatchlists() {
         watchlistRepository.getAllWatchlistsFuture().thenAccept((watchlists -> {
             Arrays.stream(watchlists).forEach(watchlist -> {
-                // System.out.println(watchlist.id());
-                watchlistRepository.postWatchlistFuture(watchlist);
-                // watchlistRepository.getWatchlistByIdFuture(watchlist.id());
+                // System.out.println("Watchlist" + watchlist);
+                
+                watchlistRepository.getWatchlistByIdFuture(watchlist.id()).thenAccept(watchlistWithAssets -> {
+                    System.out.println("Watchlist with assets" + watchlistWithAssets);
+            
+                    watchlistRepository.postWatchlistFuture(watchlistWithAssets).thenAccept(response -> {
+                         System.out.println("Successfully posted watchlist: " + watchlistWithAssets.id());
+                    });
+                });
             });
-        }));
-        
+        }));        
     }
 }
