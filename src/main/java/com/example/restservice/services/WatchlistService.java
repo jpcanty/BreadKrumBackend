@@ -67,10 +67,13 @@ public class WatchlistService {
         }
     }
 
+    // chain on getWatchlistById, inside the forEach 
     public void postAllWatchlists() {
         watchlistRepository.getAllWatchlistsFuture().thenAccept((watchlists -> {
             Arrays.stream(watchlists).forEach(watchlist -> {
+                // System.out.println(watchlist.id());
                 watchlistRepository.postWatchlistFuture(watchlist);
+                // watchlistRepository.getWatchlistByIdFuture(watchlist.id());
             });
         }));
         
