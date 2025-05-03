@@ -2,6 +2,7 @@ package com.example.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -49,7 +50,7 @@ public class WatchlistService {
 
             Watchlist watchlist = mapper.readValue(entity, Watchlist.class);
             ResponseEntity<Void> response = watchlistRepository.postWatchlist(watchlist);
-            System.out.println(response);
+            // System.out.println(response);
             Boolean isOk = response.getStatusCode() == HttpStatusCode.valueOf(201);
 
             if(isOk) {
@@ -64,5 +65,22 @@ public class WatchlistService {
 
             return "failed";
         }
+    }
+
+    // chain on getWatchlistById, inside the forEach 
+    public void postAllWatchlists() {
+        watchlistRepository.getAllWatchlistsFuture().thenAccept((watchlists -> {
+            Arrays.stream(watchlists).forEach(watchlist -> {
+                // System.out.println("Watchlist" + watchlist);
+                
+                watchlistRepository.getWatchlistByIdFuture(watchlist.id()).thenAccept(watchlistWithAssets -> {
+                    System.out.println("Watchlist with assets" + watchlistWithAssets);
+            
+                    watchlistRepository.postWatchlistFuture(watchlistWithAssets).thenAccept(response -> {
+                         System.out.println("Successfully posted watchlist: " + watchlistWithAssets.id());
+                    });
+                });
+            });
+        }));        
     }
 }
