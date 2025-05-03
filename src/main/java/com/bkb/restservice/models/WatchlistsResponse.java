@@ -1,4 +1,4 @@
-package com.example.restservice.models;
+package com.bkb.restservice.models;
 
 import java.util.List;
 

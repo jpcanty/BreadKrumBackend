@@ -1,12 +1,12 @@
-package com.example.restservice.controllers;
+package com.bkb.restservice.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.restservice.models.Watchlist;
-import com.example.restservice.services.WatchlistService;
+import com.bkb.restservice.models.Watchlist;
+import com.bkb.restservice.services.WatchlistService;
 
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;

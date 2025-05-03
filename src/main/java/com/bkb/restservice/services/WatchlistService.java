@@ -1,16 +1,15 @@
-package com.example.restservice.services;
+package com.bkb.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.example.restservice.models.Watchlist;
-import com.example.restservice.repositories.WatchlistRepository;
+import com.bkb.restservice.models.Watchlist;
+import com.bkb.restservice.repositories.WatchlistRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -18,7 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class WatchlistService {
     @Autowired
     private WatchlistRepository watchlistRepository; 
-    final ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public List<Watchlist> getAllWatchlists() {
         try {
@@ -48,7 +48,7 @@ public class WatchlistService {
     public String postWatchlist(String entity) {
         try {
 
-            Watchlist watchlist = mapper.readValue(entity, Watchlist.class);
+            Watchlist watchlist = objectMapper.readValue(entity, Watchlist.class);
             ResponseEntity<Void> response = watchlistRepository.postWatchlist(watchlist);
             // System.out.println(response);
             Boolean isOk = response.getStatusCode() == HttpStatusCode.valueOf(201);
