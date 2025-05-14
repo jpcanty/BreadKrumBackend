@@ -2,3 +2,4 @@
 .gradle
 .vs_code
 build
+bin

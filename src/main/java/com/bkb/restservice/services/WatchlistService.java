@@ -2,85 +2,44 @@ package com.bkb.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class WatchlistService {
     @Autowired
-    private WatchlistRepository watchlistRepository; 
-    @Autowired
-    private ObjectMapper objectMapper;
+    private WatchlistRepository watchlistRepository;
 
-    public List<Watchlist> getAllWatchlists() {
-        try {
-            return Arrays.asList(watchlistRepository.getAllWatchlists());
-        }
-
-        catch(JsonProcessingException e) {
-            System.out.println("Unable to parse watchlists");
-            System.out.println(e);
-        }
-        return List.of();
+    public CompletionStage<Watchlist[]> getAllWatchlists() {
+        return watchlistRepository.getAllWatchlists();
     }
 
-    public Watchlist getWatchlistById(String id) {
-        try {
-            return watchlistRepository.getWatchlistById(id);
-        }
-
-        catch(JsonProcessingException e) {
-            System.out.println("Unable to get watchlist with that id");
-            System.out.println(e);
-        }
-        
-        return new Watchlist(null, null, null, null);
+    public CompletionStage<Watchlist> getWatchlistById(String id) {
+        return watchlistRepository.getWatchlistById(id);
     }
 
-    public String postWatchlist(String entity) {
-        try {
+    public CompletionStage<String> postWatchlist(Watchlist watchlist) {
+        return watchlistRepository.postWatchlist(watchlist);
 
-            Watchlist watchlist = objectMapper.readValue(entity, Watchlist.class);
-            ResponseEntity<Void> response = watchlistRepository.postWatchlist(watchlist);
-            // System.out.println(response);
-            Boolean isOk = response.getStatusCode() == HttpStatusCode.valueOf(201);
-
-            if(isOk) {
-                return watchlist.id();
-            }
-            return response.getStatusCode().toString();
-        }
-
-        catch(JsonProcessingException e){
-            System.out.println("Unable to parse watchlist " + entity);
-            System.out.println(e);
-
-            return "failed";
-        }
     }
 
-    // chain on getWatchlistById, inside the forEach 
-    public void postAllWatchlists() {
-        watchlistRepository.getAllWatchlistsFuture().thenAccept((watchlists -> {
-            Arrays.stream(watchlists).forEach(watchlist -> {
-                // System.out.println("Watchlist" + watchlist);
-                
-                watchlistRepository.getWatchlistByIdFuture(watchlist.id()).thenAccept(watchlistWithAssets -> {
-                    System.out.println("Watchlist with assets" + watchlistWithAssets);
-            
-                    watchlistRepository.postWatchlistFuture(watchlistWithAssets).thenAccept(response -> {
-                         System.out.println("Successfully posted watchlist: " + watchlistWithAssets.id());
-                    });
-                });
-            });
-        }));        
+    public CompletionStage<Void> postAllWatchlists() {
+        return watchlistRepository.getAllWatchlists().thenCompose(this::postAllWatchlists);
+    }
+
+    private CompletionStage<Void> postAllWatchlists(Watchlist[] watchlists) {
+        List<CompletionStage<String>> futures = Arrays.stream(watchlists)
+                .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
+                        .thenCompose(watchlistWithAssets -> watchlistRepository.postWatchlist(watchlistWithAssets)))
+                .toList();
+
+        //Combine list of futures into one future
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 }
