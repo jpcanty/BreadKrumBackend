@@ -58,4 +58,11 @@ public class WatchlistsController {
             throw new RuntimeException("Unable to parse watchlist");
         }
     }
+
+    @GetMapping("/stockpriceSymbol")
+    public CompletionStage<Watchlist> getStockPriceHistoryBySymbol(
+            @RequestParam(value = "symbol", defaultValue = "") String symbol,
+            @RequestParam(value = "timeframe", defaultValue = "") String timeframe) {
+        return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
+    }
 }

@@ -53,4 +53,15 @@ public class WatchlistRepository {
             }
         });
     }
+
+    public CompletionStage<Watchlist> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
+        return alpacaClient.getStockPriceHistoryBySymbolFuture(symbol, timeframe).thenApply(response -> {
+            try {
+                // Deserialize the response into Watchlist
+                return objectMapper.readValue(response, Watchlist.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to process JSON response", e);
+            }
+        });
+    }
 }

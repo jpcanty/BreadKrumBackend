@@ -42,4 +42,8 @@ public class WatchlistService {
         //Combine list of futures into one future
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
+
+    public CompletionStage<Watchlist> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
+        return watchlistRepository.getStockPriceHistoryBySymbol(symbol, timeframe);
+    }
 }
