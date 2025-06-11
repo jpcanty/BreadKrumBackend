@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.services.WatchlistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -60,7 +61,7 @@ public class WatchlistsController {
     }
 
     @GetMapping("/stockpriceSymbol")
-    public CompletionStage<Watchlist> getStockPriceHistoryBySymbol(
+    public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(
             @RequestParam(value = "symbol", defaultValue = "") String symbol,
             @RequestParam(value = "timeframe", defaultValue = "") String timeframe) {
         return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);

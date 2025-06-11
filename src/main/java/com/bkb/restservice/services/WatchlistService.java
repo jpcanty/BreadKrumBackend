@@ -8,6 +8,7 @@ import java.util.concurrent.CompletionStage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
 
@@ -43,7 +44,7 @@ public class WatchlistService {
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
-    public CompletionStage<Watchlist> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
+    public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
         return watchlistRepository.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 }

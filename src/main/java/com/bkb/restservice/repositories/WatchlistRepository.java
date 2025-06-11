@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.bkb.restservice.clients.AlpacaClient;
 import com.bkb.restservice.clients.Back4AppClient;
+import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,11 +55,11 @@ public class WatchlistRepository {
         });
     }
 
-    public CompletionStage<Watchlist> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
+    public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
         return alpacaClient.getStockPriceHistoryBySymbolFuture(symbol, timeframe).thenApply(response -> {
             try {
                 // Deserialize the response into Watchlist
-                return objectMapper.readValue(response, Watchlist.class);
+                return objectMapper.readValue(response, StockPrice.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException("Failed to process JSON response", e);
             }
