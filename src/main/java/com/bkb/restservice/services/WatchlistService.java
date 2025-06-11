@@ -16,6 +16,8 @@ import com.bkb.restservice.repositories.WatchlistRepository;
 public class WatchlistService {
     @Autowired
     private WatchlistRepository watchlistRepository;
+    //@Autowired
+    //private StockPriceRepository repo;
 
     public CompletionStage<Watchlist[]> getAllWatchlists() {
         return watchlistRepository.getAllWatchlists();
@@ -36,7 +38,15 @@ public class WatchlistService {
 
     private CompletionStage<Void> postAllWatchlists(Watchlist[] watchlists) {
         List<CompletionStage<String>> futures = Arrays.stream(watchlists)
+        // Get all watchlist assets
                 .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
+
+                // TODO
+                // Get symbols set from watchlists
+                // Get stock symbols for watchlist
+                // Aggregate stock price into Watchlist via Assets
+
+                // Write watchlist to db
                         .thenCompose(watchlistWithAssets -> watchlistRepository.postWatchlist(watchlistWithAssets)))
                 .toList();
 
