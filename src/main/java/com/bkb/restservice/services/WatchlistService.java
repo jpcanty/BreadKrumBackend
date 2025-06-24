@@ -2,6 +2,7 @@ package com.bkb.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.models.Asset;
+import com.bkb.restservice.models.PriceHistory;
 import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
@@ -44,15 +46,19 @@ public class WatchlistService {
                 // Get all watchlist assets
                 .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
                         .thenApply(watchlistWithAssets -> {
-                            //1
+                            // 1
                             Set<String> assetSymbols = watchlistWithAssets.assets().stream().map(Asset::symbol)
                                     .collect(Collectors.toSet());
-                            //2
-                            watchlistRepository.getStockPriceHistoryBySymbols(assetSymbols, "1D");
+                            // 2
+                            StockPrice stockPrice= watchlistRepository.getStockPriceHistoryBySymbols(assetSymbols, "1D").toCompletableFuture()
+                                    .join();
 
-                            //3 Incomplete (Use result from step 1 and 2, to append stock price and pct change)
-                            List<Asset> newAssets = watchlistWithAssets.assets().stream().map(asset -> new Asset(asset.id(), asset.symbol(), asset.name(), 0, 0)).toList();
-                            Watchlist newWatchlist = new Watchlist(watchlistWithAssets.id(), watchlistWithAssets.name(), watchlistWithAssets.account_id(), newAssets);
+                            // 3 Incomplete (Use result from step 1 and 2, to append stock price and pct
+                            // change)
+                            List<Asset> newAssets = watchlistWithAssets.assets().stream()
+                                    .map(asset -> new Asset(asset.id(), asset.symbol(), asset.name(), getPrice(stockPrice.bars(), asset.symbol()), 0)).toList();
+                            Watchlist newWatchlist = new Watchlist(watchlistWithAssets.id(), watchlistWithAssets.name(),
+                                    watchlistWithAssets.account_id(), newAssets);
                             return newWatchlist;
                         })
                         // TODO
@@ -66,6 +72,18 @@ public class WatchlistService {
 
         // Combine list of futures into one future
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+    private double getPrice(Map<String,PriceHistory[]> bars, String symbol) {
+        PriceHistory[] priceHistory = bars.get(symbol);
+
+        if (priceHistory == null) {
+            System.out.println(bars);
+            System.out.println(symbol);
+            return 0;
+        }
+
+        return Double.valueOf(priceHistory[0].c());
     }
 
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
