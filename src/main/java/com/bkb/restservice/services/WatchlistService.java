@@ -2,12 +2,15 @@ package com.bkb.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bkb.restservice.models.Asset;
 import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
@@ -16,8 +19,8 @@ import com.bkb.restservice.repositories.WatchlistRepository;
 public class WatchlistService {
     @Autowired
     private WatchlistRepository watchlistRepository;
-    //@Autowired
-    //private StockPriceRepository repo;
+    // @Autowired
+    // private StockPriceRepository repo;
 
     public CompletionStage<Watchlist[]> getAllWatchlists() {
         return watchlistRepository.getAllWatchlists();
@@ -38,19 +41,30 @@ public class WatchlistService {
 
     private CompletionStage<Void> postAllWatchlists(Watchlist[] watchlists) {
         List<CompletionStage<String>> futures = Arrays.stream(watchlists)
-        // Get all watchlist assets
+                // Get all watchlist assets
                 .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
+                        .thenApply(watchlistWithAssets -> {
+                            //1
+                            Set<String> assetSymbols = watchlistWithAssets.assets().stream().map(Asset::symbol)
+                                    .collect(Collectors.toSet());
+                            //2
+                            watchlistRepository.getStockPriceHistoryBySymbols(assetSymbols, "1D");
 
-                // TODO
-                // Get symbols set from watchlists
-                // Get stock symbols for watchlist
-                // Aggregate stock price into Watchlist via Assets
+                            //3 Incomplete (Use result from step 1 and 2, to append stock price and pct change)
+                            List<Asset> newAssets = watchlistWithAssets.assets().stream().map(asset -> new Asset(asset.id(), asset.symbol(), asset.name(), 0, 0)).toList();
+                            Watchlist newWatchlist = new Watchlist(watchlistWithAssets.id(), watchlistWithAssets.name(), watchlistWithAssets.account_id(), newAssets);
+                            return newWatchlist;
+                        })
+                        // TODO
+                        // 1. Get symbols set from watchlists
+                        // 2. Get stock symbols for watchlist
+                        // 3. Aggregate stock price into Watchlist via Assets
 
-                // Write watchlist to db
+                        // Write watchlist to db
                         .thenCompose(watchlistWithAssets -> watchlistRepository.postWatchlist(watchlistWithAssets)))
                 .toList();
 
-        //Combine list of futures into one future
+        // Combine list of futures into one future
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 

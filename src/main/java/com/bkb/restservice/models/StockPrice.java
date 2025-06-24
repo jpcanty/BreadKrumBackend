@@ -1,4 +1,4 @@
 package com.bkb.restservice.models;
-import java.util.List;
+import java.util.Map;
 
-public record StockPrice(List<PriceHistory> bars, String symbol, String nextPage){}
+public record StockPrice(Map<String, PriceHistory[]> bars, String nextPageToken){}

@@ -1,5 +1,7 @@
 package com.bkb.restservice.clients;
 
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -46,6 +48,15 @@ public class AlpacaClient {
     public CompletionStage<String> getStockPriceHistoryBySymbolFuture(String symbol, String timeframe) {
         return CompletableFuture.supplyAsync(() -> {
             return restClient.get().uri(DATA_BASE_URL + "/" + symbol + "/bars?timeframe=" + timeframe)
+            .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
+            .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
+            .retrieve()
+            .body(String.class);
+        });
+    }
+    public CompletionStage<String> getStockPriceHistoryBySymbolsFuture(Set<String> symbols, String timeframe) {
+        return CompletableFuture.supplyAsync(() -> {
+            return restClient.get().uri(DATA_BASE_URL + "/bars?symbols=" + String.join(",", symbols) + "&timeframe=" + timeframe)
             .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
             .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
             .retrieve()
