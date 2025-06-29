@@ -56,11 +56,27 @@ public class WatchlistService {
                             // 3 Incomplete (Use result from step 1 and 2, to append stock price and pct
                             // change)
                             List<Asset> newAssets = watchlistWithAssets.assets().stream()
-                                    .map(asset -> new Asset(asset.id(), asset.symbol(), asset.name(), getPrice(stockPrice.bars(), asset.symbol()), 0)).toList();
-                            Watchlist newWatchlist = new Watchlist(watchlistWithAssets.id(), watchlistWithAssets.name(),
-                                    watchlistWithAssets.account_id(), newAssets);
-                            return newWatchlist;
-                        })
+                    .map(asset -> {
+                        PriceHistory[] priceHistory = stockPrice.bars().get(asset.symbol());
+                        double price = getPrice(stockPrice.bars(), asset.symbol());
+                        double pct = 0.0;
+                        if (priceHistory != null && priceHistory.length > 0) {
+                            double close = Double.parseDouble(priceHistory[0].c());
+                            double open = Double.parseDouble(priceHistory[0].o());
+                            pct = calculatePct(close, open);
+                        }
+                        return new Asset(asset.id(), asset.symbol(), asset.name(), price, pct);
+                    })
+                    .toList();
+
+                Watchlist newWatchlist = new Watchlist(
+                    watchlistWithAssets.id(),
+                    watchlistWithAssets.name(),
+                    watchlistWithAssets.account_id(),
+                    newAssets
+                );
+                return newWatchlist;
+            })
                         // TODO
                         // 1. Get symbols set from watchlists
                         // 2. Get stock symbols for watchlist
@@ -84,6 +100,13 @@ public class WatchlistService {
         }
 
         return Double.valueOf(priceHistory[0].c());
+    }
+
+    private double calculatePct(double close, double open) {
+        if (open == 0) return 0.0;
+        double pct = (close - open) / open;
+        System.out.println(pct);
+        return Math.round(pct * 10000.0) / 10000.0;
     }
 
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
