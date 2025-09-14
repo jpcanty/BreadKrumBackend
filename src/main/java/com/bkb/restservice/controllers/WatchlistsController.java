@@ -1,10 +1,12 @@
 package com.bkb.restservice.controllers;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.services.WatchlistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -26,7 +28,7 @@ public class WatchlistsController {
 
 
     @GetMapping("/watchlists")
-    public CompletionStage<Watchlist[]> getAllWatchlists() {
+    public CompletionStage<List<Watchlist>> getAllWatchlists() {
         return watchlistService.getAllWatchlists();
     }
 
@@ -57,5 +59,13 @@ public class WatchlistsController {
 
             throw new RuntimeException("Unable to parse watchlist");
         }
+    }
+
+    @GetMapping("/stockpriceSymbol")
+    public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(
+            @RequestParam(value = "symbol", defaultValue = "") String symbol,
+            @RequestParam(value = "timeframe", defaultValue = "") String timeframe) {
+                return null;
+        //return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 }
