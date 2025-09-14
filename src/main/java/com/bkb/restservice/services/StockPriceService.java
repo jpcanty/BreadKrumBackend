@@ -18,16 +18,8 @@ public class StockPriceService {
     @Autowired
     private StockPriceRepository stockPriceRepository;
 
-    public static Asset stockPriceAsset(Asset asset, StockPrice stockPrice) {
-        PriceHistory[] priceHistory = stockPrice.bars().get(asset.symbol());
-        double price = getPrice(stockPrice.bars(), asset.symbol());
-        double pct = 0.0;
-        if (priceHistory != null && priceHistory.length > 0) {
-            double close = Double.parseDouble(priceHistory[0].c());
-            double open = Double.parseDouble(priceHistory[0].o());
-            pct = calculatePct(close, open);
-        }
-        return new Asset(asset.id(), asset.symbol(), asset.name(), price, pct);
+    public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
+        return stockPriceRepository.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 
     public Watchlist hydrateStockPrice(Watchlist watchlistWithAssets) {
@@ -50,6 +42,19 @@ public class StockPriceService {
         return newWatchlist;
     }
 
+
+    public static Asset stockPriceAsset(Asset asset, StockPrice stockPrice) {
+        PriceHistory[] priceHistory = stockPrice.bars().get(asset.symbol());
+        double price = getPrice(stockPrice.bars(), asset.symbol());
+        double pct = 0.0;
+        if (priceHistory != null && priceHistory.length > 0) {
+            double close = Double.parseDouble(priceHistory[0].c());
+            double open = Double.parseDouble(priceHistory[0].o());
+            pct = calculatePct(close, open);
+        }
+        return new Asset(asset.id(), asset.symbol(), asset.name(), price, pct);
+    }
+
     private static double getPrice(Map<String, PriceHistory[]> bars, String symbol) {
         PriceHistory[] priceHistory = bars.get(symbol);
 
@@ -68,9 +73,5 @@ public class StockPriceService {
         double pct = (close - open) / open;
         System.out.println(pct);
         return Math.round(pct * 10000.0) / 10000.0;
-    }
-
-    public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
-        return stockPriceRepository.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 }

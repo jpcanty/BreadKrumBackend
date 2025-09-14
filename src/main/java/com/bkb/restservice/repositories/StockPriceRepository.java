@@ -28,7 +28,7 @@ public class StockPriceRepository {
         });
     }
 
-     public CompletionStage<StockPrice> getStockPriceHistoryBySymbols(Set<String> symbols, String timeframe) {
+    public CompletionStage<StockPrice> getStockPriceHistoryBySymbols(Set<String> symbols, String timeframe) {
         return alpacaClient.getStockPriceHistoryBySymbolsFuture(symbols, timeframe).thenApply(response -> {
             try {
                 System.out.println(response);
@@ -39,5 +39,5 @@ public class StockPriceRepository {
             }
         });
     }
-    
+
 }

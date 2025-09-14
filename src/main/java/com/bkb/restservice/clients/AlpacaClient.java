@@ -1,6 +1,5 @@
 package com.bkb.restservice.clients;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
