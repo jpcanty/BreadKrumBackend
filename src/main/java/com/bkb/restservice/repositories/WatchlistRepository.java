@@ -59,7 +59,6 @@ public class WatchlistRepository {
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
         return alpacaClient.getStockPriceHistoryBySymbolsFuture(Set.of(symbol), timeframe).thenApply(response -> {
             try {
-                System.out.println(response);
                 // Deserialize the response into Watchlist
                 return objectMapper.readValue(response, StockPrice.class);
             } catch (JsonProcessingException e) {
@@ -70,7 +69,6 @@ public class WatchlistRepository {
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbols(Set<String> symbols, String timeframe) {
         return alpacaClient.getStockPriceHistoryBySymbolsFuture(symbols, timeframe).thenApply(response -> {
             try {
-                System.out.println(response);
                 // Deserialize the response into Watchlist
                 return objectMapper.readValue(response, StockPrice.class);
             } catch (JsonProcessingException e) {

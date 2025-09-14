@@ -7,6 +7,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.models.Asset;
 import com.bkb.restservice.models.PriceHistory;
@@ -14,6 +15,7 @@ import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.repositories.StockPriceRepository;
 
+@Service
 public class StockPriceService {
     @Autowired
     private StockPriceRepository stockPriceRepository;
@@ -59,8 +61,6 @@ public class StockPriceService {
         PriceHistory[] priceHistory = bars.get(symbol);
 
         if (priceHistory == null) {
-            System.out.println(bars);
-            System.out.println(symbol);
             return 0;
         }
 
@@ -71,7 +71,6 @@ public class StockPriceService {
         if (open == 0)
             return 0.0;
         double pct = (close - open) / open;
-        System.out.println(pct);
         return Math.round(pct * 10000.0) / 10000.0;
     }
 }

@@ -3,6 +3,10 @@ package com.bkb.restservice.clients;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.time.DayOfWeek;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -53,14 +57,30 @@ public class AlpacaClient {
             .body(String.class);
         });
     }
-    public CompletionStage<String> getStockPriceHistoryBySymbolsFuture(Set<String> symbols, String timeframe) {
-        return CompletableFuture.supplyAsync(() -> {
-            return restClient.get().uri(DATA_BASE_URL + "/bars?symbols=" + String.join(",", symbols) + "&timeframe=" + timeframe)
+
+public CompletionStage<String> getStockPriceHistoryBySymbolsFuture(Set<String> symbols, String timeframe) {
+    // Determine last weekday
+    ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+    DayOfWeek day = now.getDayOfWeek();
+    if (day == DayOfWeek.SATURDAY) {
+        now = now.minusDays(1); // Friday
+    } else if (day == DayOfWeek.SUNDAY) {
+        now = now.minusDays(2); // Friday
+    }
+
+    // Format as ISO 8601
+    String lastWeekday = now.toLocalDate().atStartOfDay(ZoneOffset.UTC)
+            .format(DateTimeFormatter.ISO_INSTANT);
+
+    return CompletableFuture.supplyAsync(() -> {
+        return restClient.get()
+            .uri(DATA_BASE_URL + "/bars?symbols=" + String.join(",", symbols)
+                 + "&timeframe=" + timeframe
+                 + "&start=" + lastWeekday)
             .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
             .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
             .retrieve()
             .body(String.class);
         });
     }
-    
 }

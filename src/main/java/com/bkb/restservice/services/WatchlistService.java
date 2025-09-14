@@ -18,9 +18,27 @@ public class WatchlistService {
     @Autowired
     private StockPriceService stockPriceService;
 
-    public CompletionStage<Watchlist[]> getAllWatchlists() {
-        return watchlistRepository.getAllWatchlists();
+    public CompletionStage<List<Watchlist>> getAllWatchlists() {
+        return watchlistRepository.getAllWatchlists().thenCompose(this::hydrate);
     }
+
+    private CompletionStage<List<Watchlist>> hydrate(Watchlist[] watchlists) {
+    List<CompletionStage<Watchlist>> futures = Arrays.stream(watchlists)
+        .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
+                .thenApply(watchlistWithAssets -> stockPriceService.hydrateStockPrice(watchlistWithAssets))
+        )
+        .toList();
+
+    // Combine all futures into one CompletionStage<List<Watchlist>>
+    return CompletableFuture
+            .allOf(futures.toArray(new CompletableFuture[0]))
+            .thenApply(v -> futures.stream()
+                    .map(CompletionStage::toCompletableFuture)
+                    .map(CompletableFuture::join)
+                    .toList()
+            );
+    }
+
 
     public CompletionStage<Watchlist> getWatchlistById(String id) {
         return watchlistRepository.getWatchlistById(id);

@@ -1,4 +1,5 @@
 package com.bkb.restservice.controllers;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class WatchlistsController {
 
 
     @GetMapping("/watchlists")
-    public CompletionStage<Watchlist[]> getAllWatchlists() {
+    public CompletionStage<List<Watchlist>> getAllWatchlists() {
         return watchlistService.getAllWatchlists();
     }
 
@@ -64,6 +65,7 @@ public class WatchlistsController {
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(
             @RequestParam(value = "symbol", defaultValue = "") String symbol,
             @RequestParam(value = "timeframe", defaultValue = "") String timeframe) {
-        return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
+                return null;
+        //return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 }
