@@ -1,5 +1,5 @@
 .DS_Store
 .gradle
-.vs_code
+.vs_code/
 build
 bin
