@@ -1,0 +1,27 @@
+# Ignore build outputs
+/build
+/build/**
+/target
+/target/**
+
+# Ignore Gradle cache
+.gradle
+.gradle/**
+**/out
+**/out/**
+
+# Ignore IDE/project files
+*.iml
+*.ipr
+*.iws
+.idea
+.vscode
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore Git files
+.git
+.gitignore
+
