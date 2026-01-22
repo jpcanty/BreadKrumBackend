@@ -28,8 +28,9 @@ public class Back4AppClient {
             if (assets == null) {
                 assets = List.of();
             }
-            return restClient.post()
-                    .uri("https://parseapi.back4app.com/classes/Watchlist2")
+            String watchList = "Watchlist3";
+            return restClient.post()                  
+                    .uri("https://parseapi.back4app.com/classes/" + watchList)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
