@@ -28,12 +28,25 @@ public class WatchlistsController {
     @Autowired
     private ObjectMapper objectMapper;
 
-
+//  @GetMapping("/watchlists/all")
     @GetMapping("/watchlists")
     public CompletionStage<List<Watchlist>> getAllWatchlists() {
         return watchlistService.getAllWatchlists();
     }
+/*
+    Create a new method at /watchlists/ that accepts a list of 
+    strings as a param and limits the numbers of params to 10
 
+
+    @GetMapping("/watchlists")
+    public CompletionStage<List<Watchlist>> getAllWatchlists(@RequestParam(value="params", defaultValue=List.of() List<String> params) {
+        if (params.size() > 10) {
+            // throw error
+        }
+        return watchlistService.getAllWatchlists();
+    }
+
+*/
     @GetMapping("/watchlistId")
     public CompletionStage<Watchlist> getWatchlistById(@RequestParam(value = "id", defaultValue = "") String id) {
         return watchlistService.getWatchlistById(id);
