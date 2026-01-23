@@ -1,4 +1,5 @@
 package com.bkb.restservice.controllers;
+
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 // Controller is the entry into the backend service 
 @RestController
 @CrossOrigin(origins = "http://localhost:8080")
@@ -28,37 +28,37 @@ public class WatchlistsController {
     @Autowired
     private ObjectMapper objectMapper;
 
-//  @GetMapping("/watchlists/all")
-    @GetMapping("/watchlists")
+    @GetMapping("/watchlists/all")
     public CompletionStage<List<Watchlist>> getAllWatchlists() {
         return watchlistService.getAllWatchlists();
     }
-/*
-    Create a new method at /watchlists/ that accepts a list of 
-    strings as a param and limits the numbers of params to 10
 
-
+    /*
+     * Create a new method at /watchlists/ that accepts a list of
+     * strings as a param and limits the numbers of params to 10
+     * 
+     */
     @GetMapping("/watchlists")
-    public CompletionStage<List<Watchlist>> getAllWatchlists(@RequestParam(value="params", defaultValue=List.of() List<String> params) {
+    public CompletionStage<List<Watchlist>> get10Watchlists(@RequestParam(value = "params") List<String> params) {
         if (params.size() > 10) {
             // throw error
         }
-        return watchlistService.getAllWatchlists();
+        return watchlistService.getWatchlistsByName(params);
     }
 
-*/
     @GetMapping("/watchlistId")
     public CompletionStage<Watchlist> getWatchlistById(@RequestParam(value = "id", defaultValue = "") String id) {
         return watchlistService.getWatchlistById(id);
     }
-    
-    //posting watchlist to the frontend use  ObjectMapper objectMapper turns string to object
+
+    // posting watchlist to the frontend use ObjectMapper objectMapper turns string
+    // to object
     @PostMapping("/watchlist")
     public CompletionStage<String> postWatchlist(@RequestBody String entity) {
         final Watchlist watchlist = buildWatchlistRequestEntity(entity);
         return watchlistService.postWatchlist(watchlist);
     }
-    
+
     @PostMapping("/watchlists")
     public CompletionStage<Void> postWatchlists() {
         return watchlistService.postAllWatchlists();
@@ -67,8 +67,7 @@ public class WatchlistsController {
     private Watchlist buildWatchlistRequestEntity(String entity) {
         try {
             return objectMapper.readValue(entity, Watchlist.class);
-        }
-        catch(JsonProcessingException e){
+        } catch (JsonProcessingException e) {
             System.out.println("Unable to parse watchlist " + entity);
             System.out.println(e);
 
@@ -80,7 +79,7 @@ public class WatchlistsController {
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(
             @RequestParam(value = "symbol", defaultValue = "") String symbol,
             @RequestParam(value = "timeframe", defaultValue = "") String timeframe) {
-                return null;
-        //return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
+        return null;
+        // return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 }

@@ -23,22 +23,19 @@ public class WatchlistService {
     }
 
     private CompletionStage<List<Watchlist>> hydrate(Watchlist[] watchlists) {
-    List<CompletionStage<Watchlist>> futures = Arrays.stream(watchlists)
-        .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
-                .thenApply(watchlistWithAssets -> stockPriceService.hydrateStockPrice(watchlistWithAssets))
-        )
-        .toList();
+        List<CompletionStage<Watchlist>> futures = Arrays.stream(watchlists)
+                .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
+                        .thenApply(watchlistWithAssets -> stockPriceService.hydrateStockPrice(watchlistWithAssets)))
+                .toList();
 
-    // Combine all futures into one CompletionStage<List<Watchlist>>
-    return CompletableFuture
-            .allOf(futures.toArray(new CompletableFuture[0]))
-            .thenApply(v -> futures.stream()
-                    .map(CompletionStage::toCompletableFuture)
-                    .map(CompletableFuture::join)
-                    .toList()
-            );
+        // Combine all futures into one CompletionStage<List<Watchlist>>
+        return CompletableFuture
+                .allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream()
+                        .map(CompletionStage::toCompletableFuture)
+                        .map(CompletableFuture::join)
+                        .toList());
     }
-
 
     public CompletionStage<Watchlist> getWatchlistById(String id) {
         return watchlistRepository.getWatchlistById(id);
@@ -64,5 +61,14 @@ public class WatchlistService {
 
         // Combine list of futures into one future
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+    public CompletionStage<List<Watchlist>> getWatchlistsByName(List<String> names) {
+
+        return getAllWatchlists().thenApply(watchlists -> {
+            return watchlists.stream()
+                    .filter(watchlist -> names.contains(watchlist.name()))
+                    .toList();
+        });
     }
 }
