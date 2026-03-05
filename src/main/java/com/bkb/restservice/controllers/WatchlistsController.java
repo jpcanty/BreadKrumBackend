@@ -49,6 +49,11 @@ public class WatchlistsController {
     }
 
 
+    @GetMapping("watchlists/subset")
+    public CompletionStage<List<Watchlist>>  getWatchlistSubset(){
+
+        return watchlistService.getWatchlistByEnabled();
+    }
 
 
     @GetMapping("/watchlistId")
@@ -87,4 +92,6 @@ public class WatchlistsController {
         return null;
         // return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
+
 }
+

@@ -29,12 +29,22 @@ public class WatchlistService {
                     .filter(watchlist -> { 
                        boolean hasName =  params.contains(watchlist.name());  
                        boolean hasID = params.contains(watchlist.id());  
-                       List<String> assets = watchlist.assets().stream().map( asset -> asset.symbol() ).toList();
-                       boolean hasAssetSymbol = params.stream().filter(param -> assets.contains(param)).findAny().isPresent();
-                       System.out.println( assets); 
-                       return hasName || hasID || hasAssetSymbol; 
+                       boolean hasAssetSymbolOrName = watchlist.assets().stream().filter(asset -> params.contains(asset.symbol() ) || params.contains( asset.name())).findAny().isPresent();
+                       System.out.println(params); 
+                       return hasName || hasID || hasAssetSymbolOrName; 
                     //    add logic for the asset name -- as along as the substring exists in the name.
                     }) 
+                    .toList();
+        });
+    }
+
+    public CompletionStage<List<Watchlist>> getWatchlistByEnabled(){
+
+        return getAllWatchlists().thenApply( watchlists -> {
+            return watchlists.stream()
+                    .filter(watchlist -> {
+                        return watchlist.enabled();
+                    })
                     .toList();
         });
     }

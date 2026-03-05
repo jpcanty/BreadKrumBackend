@@ -40,7 +40,8 @@ public class StockPriceService {
                 watchlistWithAssets.id(),
                 watchlistWithAssets.name(),
                 watchlistWithAssets.account_id(),
-                newAssets);
+                newAssets,
+                true            );
         return newWatchlist;
     }
 
