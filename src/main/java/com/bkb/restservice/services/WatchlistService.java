@@ -22,6 +22,23 @@ public class WatchlistService {
         return watchlistRepository.getAllWatchlists().thenCompose(this::hydrate);
     }
 
+    public CompletionStage<List<Watchlist>> getWatchlistsByName(List<String> params) {
+
+        return getAllWatchlists().thenApply(watchlists -> {
+            return watchlists.stream()
+                    .filter(watchlist -> { 
+                       boolean hasName =  params.contains(watchlist.name());  
+                       boolean hasID = params.contains(watchlist.id());  
+                       List<String> assets = watchlist.assets().stream().map( asset -> asset.symbol() ).toList();
+                       boolean hasAssetSymbol = params.stream().filter(param -> assets.contains(param)).findAny().isPresent();
+                       System.out.println( assets); 
+                       return hasName || hasID || hasAssetSymbol; 
+                    //    add logic for the asset name -- as along as the substring exists in the name.
+                    }) 
+                    .toList();
+        });
+    }
+
     private CompletionStage<List<Watchlist>> hydrate(Watchlist[] watchlists) {
         List<CompletionStage<Watchlist>> futures = Arrays.stream(watchlists)
                 .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
@@ -61,14 +78,5 @@ public class WatchlistService {
 
         // Combine list of futures into one future
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
-    }
-
-    public CompletionStage<List<Watchlist>> getWatchlistsByName(List<String> names) {
-
-        return getAllWatchlists().thenApply(watchlists -> {
-            return watchlists.stream()
-                    .filter(watchlist -> names.contains(watchlist.name()))
-                    .toList();
-        });
     }
 }

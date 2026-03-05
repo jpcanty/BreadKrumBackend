@@ -37,6 +37,8 @@ public class WatchlistsController {
      * Create a new method at /watchlists/ that accepts a list of
      * strings as a param and limits the numbers of params to 10
      * 
+     * Input: ["Semiconductor ETF (Pseudo)", "08cecd42-aafb-42ce-b8d2-ab77a539388b"]
+     * 
      */
     @GetMapping("/watchlists")
     public CompletionStage<List<Watchlist>> get10Watchlists(@RequestParam(value = "params") List<String> params) {
@@ -45,6 +47,9 @@ public class WatchlistsController {
         }
         return watchlistService.getWatchlistsByName(params);
     }
+
+
+
 
     @GetMapping("/watchlistId")
     public CompletionStage<Watchlist> getWatchlistById(@RequestParam(value = "id", defaultValue = "") String id) {
