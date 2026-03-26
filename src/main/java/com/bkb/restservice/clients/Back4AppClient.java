@@ -68,5 +68,17 @@ public class Back4AppClient {
             // desired: {"name":"blah","assets":[], "enabled":true}
             // breaks: {"name":"blah","assets":null, "enabled":true}
         }
+
+        public CompletionStage<String> getEnabledWatchlistsFuture(){
+            return CompletableFuture.supplyAsync( () -> {
+                String enabledWatchlistsClass = "EnabledWatchlists";  // this should be the name of the Back4App class
+                return restClient.get() // GET request
+                        .uri("https://parseapi.back4app.com/classes/" + enabledWatchlistsClass)
+                        .header( "X-Parse-Application-Id" , BACK_4_APP_APPLICATION_ID)
+                        .header( "X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
+                        .retrieve() //execute the request
+                        .body(String.class); // the response is in a String
+            });
+        }
     
 }

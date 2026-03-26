@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
 
+import java.util.stream.Collectors;
+
 @Service
 public class WatchlistService {
     @Autowired
@@ -19,7 +21,26 @@ public class WatchlistService {
     private StockPriceService stockPriceService;
 
     public CompletionStage<List<Watchlist>> getAllWatchlists() {
-        return watchlistRepository.getAllWatchlists().thenCompose(this::hydrate);
+//        return watchlistRepository.getAllWatchlists().thenCompose(this::hydrate);
+        CompletionStage<Watchlist[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
+        CompletionStage<List<String>> enabledWatchlistNamesFuture = watchlistRepository.getEnabledWatchlists();
+
+        //TODO see how this would look with a thenCompose
+        return allWatchlistsFuture.thenCombine(enabledWatchlistNamesFuture, (allWatchlists, enabledNames) ->{
+            List<Watchlist> updateWatchlists = Arrays.stream(allWatchlists)
+                    .map(watchlist -> {
+                        boolean isEnabled = enabledNames.contains(watchlist.name());
+                        return new Watchlist(
+                                watchlist.id(),
+                                watchlist.name(),
+                                watchlist.account_id(),
+                                watchlist.assets(),
+                                isEnabled
+                        );
+                    })
+                    .collect(Collectors.toList());
+            return updateWatchlists.toArray(new Watchlist[0]);
+        } ). thenCompose( this::hydrate);
     }
 
     public CompletionStage<List<Watchlist>> getWatchlistsByName(List<String> params) {
@@ -39,14 +60,30 @@ public class WatchlistService {
     }
 
     public CompletionStage<List<Watchlist>> getWatchlistByEnabled(){
-    
-        return getAllWatchlists().thenApply( watchlists -> {
-            return watchlists.stream()
-                    .filter(watchlist -> {
-                        return watchlist.enabled();
+
+        CompletionStage<Watchlist[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
+        CompletionStage<List<String>> enabledWatchlistNamesFuture = watchlistRepository.getEnabledWatchlists();
+
+        //TODO see how this would look with a thenCompose
+        return allWatchlistsFuture.thenCombine(enabledWatchlistNamesFuture, (allWatchlists, enabledNames) ->{
+            List<Watchlist> updateWatchlists = Arrays.stream(allWatchlists)
+                    .map(watchlist -> {
+                        boolean isEnabled = enabledNames.contains(watchlist.name());
+                        return new Watchlist(
+                                watchlist.id(),
+                                watchlist.name(),
+                                watchlist.account_id(),
+                                watchlist.assets(),
+                                isEnabled
+                        );
                     })
-                    .toList();
-        });
+                    .filter(watchlist -> {
+                        boolean isEnabled =  watchlist.enabled();
+                        return isEnabled;
+                    })
+                    .collect(Collectors.toList());
+            return updateWatchlists.toArray(new Watchlist[0]);
+        } ). thenCompose( this::hydrate);
     }
 
     private CompletionStage<List<Watchlist>> hydrate(Watchlist[] watchlists) {
