@@ -39,7 +39,7 @@ public class WatchlistService {
     }
 
     public CompletionStage<List<Watchlist>> getWatchlistByEnabled(){
-
+    
         return getAllWatchlists().thenApply( watchlists -> {
             return watchlists.stream()
                     .filter(watchlist -> {
