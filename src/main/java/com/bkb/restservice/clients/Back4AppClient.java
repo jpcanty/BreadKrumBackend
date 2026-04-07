@@ -1,5 +1,6 @@
 package com.bkb.restservice.clients;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -24,20 +25,60 @@ public class Back4AppClient {
 
     public CompletionStage<ResponseEntity<Void>> postWatchlistFuture(Watchlist watchlist) {
         return CompletableFuture.supplyAsync(() -> {
-            List<Asset> assets = watchlist.assets();
-            if (assets == null) {
-                assets = List.of();
-            }
             String watchList = "Watchlist3";
-            return restClient.post()                  
+            return restClient.post()          
                     .uri("https://parseapi.back4app.com/classes/" + watchList)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("name", watchlist.name(), "assets", assets))
+                    .body( buildWatchlistBody(watchlist) )
                     .retrieve()
                     .toBodilessEntity();
         });
     }
+// Add the enabled column to the body
+        // Create a private method called buildWatchlistBody(watchlist)
+
+        // include 
+            //         List<Asset> assets = watchlist.assets();
+            // if (assets == null) {
+            //     assets = List.of();
+            // }
+
+        // .body(buildWatchlistBody(watchlist))
+        private Map<String, Object> buildWatchlistBody(Watchlist watchlist){
+
+            List<Asset> assets = watchlist.assets();
+            Map<String,Object> theBody = new HashMap<>();
+            theBody.put("name", watchlist.name());
+            theBody.put("enabled" , false);
+            if (assets == null) {
+                assets = List.of();
+                theBody.put("assets", assets );         
+            }
+            else{
+                theBody.put("assets", watchlist.assets() );
+            }
+            return theBody;
+            // if .assets() != null
+            // {"name":"blah","assets":["UBER"], "enabled":true}
+
+            // if .assets() == null
+            // current: {}
+            // desired: {"name":"blah","assets":[], "enabled":true}
+            // breaks: {"name":"blah","assets":null, "enabled":true}
+        }
+
+        public CompletionStage<String> getEnabledWatchlistsFuture(){
+            return CompletableFuture.supplyAsync( () -> {
+                String enabledWatchlistsClass = "EnabledWatchlists";  // this should be the name of the Back4App class
+                return restClient.get() // GET request
+                        .uri("https://parseapi.back4app.com/classes/" + enabledWatchlistsClass)
+                        .header( "X-Parse-Application-Id" , BACK_4_APP_APPLICATION_ID)
+                        .header( "X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
+                        .retrieve() //execute the request
+                        .body(String.class); // the response is in a String
+            });
+        }
     
 }
