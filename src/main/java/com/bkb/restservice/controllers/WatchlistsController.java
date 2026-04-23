@@ -14,11 +14,12 @@ import com.bkb.restservice.services.WatchlistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-// Controller is the entry into the backend service 
+// Controller is the entry into the backend service
 @RestController
 @CrossOrigin(origins = "http://localhost:8080")
 public class WatchlistsController {
@@ -27,6 +28,11 @@ public class WatchlistsController {
     private WatchlistService watchlistService;
     @Autowired
     private ObjectMapper objectMapper;
+
+    @PutMapping("/watchlist/enable")
+    public void enableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
+        watchlistService.enableWatchlist(watchlistName);
+    }
 
     @GetMapping("/watchlists/all")
     public CompletionStage<List<Watchlist>> getAllWatchlists() {

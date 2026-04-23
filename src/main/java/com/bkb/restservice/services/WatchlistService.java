@@ -43,6 +43,25 @@ public class WatchlistService {
         } ). thenCompose( this::hydrate);
     }
 
+    public void enableWatchlist(String watchlistName) {
+        CompletionStage<Watchlist[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
+        CompletionStage<List<String>> enabledWatchlistNamesFuture = watchlistRepository.getEnabledWatchlists();
+
+        allWatchlistsFuture.thenAcceptBoth(enabledWatchlistNamesFuture, (allWatchlists, enabledNames) -> {
+            if (enabledNames.contains(watchlistName)) {
+                // Watchlist is already enabled, so we do nothing.
+                return;
+            }
+
+            Arrays.stream(allWatchlists)
+                    .filter(watchlist -> watchlist.name().equals(watchlistName))
+                    .findFirst()
+                    .ifPresent(watchlist -> {
+                        watchlistRepository.enableWatchlist(watchlist);
+                    });
+        });
+    }
+
     public CompletionStage<List<Watchlist>> getWatchlistsByName(List<String> params) {
 
         return getAllWatchlists().thenApply(watchlists -> {

@@ -34,6 +34,16 @@ public class WatchlistRepository {
     @Autowired
     private ObjectMapper objectMapper;
 
+    public CompletionStage<Void> enableWatchlist(Watchlist watchlist) {
+        return back4AppClient.postEnabledWatchlist(watchlist).thenAccept(response -> {
+            Boolean isOk = response.getStatusCode() == HttpStatusCode.valueOf(201);
+
+            if (!isOk) {
+                throw new RuntimeException("Not ok response: " + response.getStatusCode().toString());
+            }
+        });
+    }
+
     public CompletionStage<String> postWatchlist(Watchlist watchlist) {
         return back4AppClient.postWatchlistFuture(watchlist).thenApply(response -> {
             Boolean isOk = response.getStatusCode() == HttpStatusCode.valueOf(201);

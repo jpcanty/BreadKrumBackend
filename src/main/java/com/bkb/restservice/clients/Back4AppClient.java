@@ -23,6 +23,23 @@ public class Back4AppClient {
     private static final String BACK_4_APP_REST_API_KEY = "URGqznPEwDMGaPmkyCJMbx7SCtvCOfDWPlvp26gF";
 
 
+    public CompletionStage<ResponseEntity<Void>> postEnabledWatchlist(Watchlist watchlist) {
+        return CompletableFuture.supplyAsync(() -> {
+            String enabledWatchlistsClass = "EnabledWatchlists";
+            Map<String, Object> body = new HashMap<>();
+            body.put("name", watchlist.name());
+
+            return restClient.post()
+                    .uri("https://parseapi.back4app.com/classes/" + enabledWatchlistsClass)
+                    .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
+                    .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+        });
+    }
+
     public CompletionStage<ResponseEntity<Void>> postWatchlistFuture(Watchlist watchlist) {
         return CompletableFuture.supplyAsync(() -> {
             String watchList = "Watchlist3";
