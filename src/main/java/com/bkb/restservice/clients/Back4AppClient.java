@@ -1,5 +1,6 @@
 package com.bkb.restservice.clients;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -24,27 +25,21 @@ public class Back4AppClient {
 
     public CompletionStage<ResponseEntity<Void>> postWatchlistFuture(Watchlist watchlist) {
         return CompletableFuture.supplyAsync(() -> {
-            List<Asset> assets = watchlist.assets();
-            if (assets == null) {
-                assets = List.of();
-            }
-            String watchList = "Watchlist3";
-            return restClient.post()                  
-                    .uri("https://parseapi.back4app.com/classes/" + watchList)
+            String tableName = "Watchlist3";
+            return restClient.post()
+                    .uri("https://parseapi.back4app.com/classes/" + tableName)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("name", watchlist.name(), "assets", assets))
+                    .body( buildWatchlistBody(watchlist) )
                     .retrieve()
                     .toBodilessEntity();
         });
     }
-<<<<<<< Updated upstream
-=======
 // Add the enabled column to the body
         // Create a private method called buildWatchlistBody(watchlist)
 
-        // include 
+        // include
             //         List<Asset> assets = watchlist.assets();
             // if (assets == null) {
             //     assets = List.of();
@@ -59,7 +54,7 @@ public class Back4AppClient {
             theBody.put("enabled" , false);
             if (assets == null) {
                 assets = List.of();
-                theBody.put("assets", assets );         
+                theBody.put("assets", assets );
             }
             else{
                 theBody.put("assets", watchlist.assets() );
@@ -98,6 +93,24 @@ public class Back4AppClient {
                         .body(String.class);
             });
         }
->>>>>>> Stashed changes
-    
+
+        // We want to write a row to a table with a POST
+        // Name of the table: EnabledWatchlists
+        // {"name":"Shoes"}
+
+        public CompletionStage<ResponseEntity<Void>> enableWatchlist (String watchlistName){
+
+            return CompletableFuture.supplyAsync(() -> {
+                String tableName = "EnabledWatchlists";
+                return restClient.post()
+                        .uri("https://parseapi.back4app.com/classes/" + tableName)
+                        .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
+                        .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(Map.of("name", watchlistName))
+                        .retrieve()
+                        .toBodilessEntity();
+            });
+        }
+
 }

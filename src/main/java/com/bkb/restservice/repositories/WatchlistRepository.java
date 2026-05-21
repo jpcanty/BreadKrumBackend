@@ -14,6 +14,17 @@ import com.bkb.restservice.models.Watchlist;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
+import java.util.stream.Collectors;
+
+//Represents a single item in the "results" array from back4app
+//@JsonProperty is used to map the JSON key "watchlist_name" to the Java record component "name"
+record EnabledWatchlist(@JsonProperty("name") String name) {}
+
+//Represents the overall JSON object returned by the Back4app query
+record EnabledWatchlistsResponse(List<EnabledWatchlist> results){}
+
 @Repository
 public class WatchlistRepository {
     @Autowired
@@ -73,6 +84,20 @@ public class WatchlistRepository {
                 return objectMapper.readValue(response, StockPrice.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException("Failed to process JSON response", e);
+            }
+        });
+    }
+
+    public CompletionStage<List <String>> getEnabledWatchlists(){
+        return back4AppClient.getEnabledWatchlistsFuture().thenApply(response ->{
+            try{
+                EnabledWatchlistsResponse enabledWatchlistsResponse = objectMapper.readValue(response, EnabledWatchlistsResponse.class);
+
+                return enabledWatchlistsResponse.results().stream()
+                        .map(EnabledWatchlist::name)
+                        .collect(Collectors.toList());
+            }catch(JsonProcessingException e){
+                throw new RuntimeException("Failed to process JSON response for enabled watchlists" , e);
             }
         });
     }
