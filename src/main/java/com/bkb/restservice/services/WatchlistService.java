@@ -8,15 +8,22 @@ import java.util.concurrent.CompletionStage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bkb.restservice.clients.Back4AppClient;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
 
 @Service
 public class WatchlistService {
     @Autowired
+    private Back4AppClient back4AppClient;
+    @Autowired
     private WatchlistRepository watchlistRepository;
     @Autowired
     private StockPriceService stockPriceService;
+
+    public CompletionStage<String> getWatchlistObjectId(String watchlistName) {
+        return back4AppClient.getWatchlistObjectId(watchlistName);
+    }
 
     public CompletionStage<List<Watchlist>> getAllWatchlists() {
         return watchlistRepository.getAllWatchlists().thenCompose(this::hydrate);

@@ -28,8 +28,22 @@ public class WatchlistsController {
     @Autowired
     private ObjectMapper objectMapper;
 
+<<<<<<< Updated upstream
 //  @GetMapping("/watchlists/all")
     @GetMapping("/watchlists")
+=======
+    @PutMapping("/watchlist/enable")
+    public void enableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
+        watchlistService.enableWatchlist(watchlistName);
+    }
+
+    @GetMapping("/watchlist/objectId")
+    public CompletionStage<String> getWatchlistObjectId(@RequestParam(value = "watchlistName") String watchlistName) {
+        return watchlistService.getWatchlistObjectId(watchlistName);
+    }
+
+    @GetMapping("/watchlists/all")
+>>>>>>> Stashed changes
     public CompletionStage<List<Watchlist>> getAllWatchlists() {
         return watchlistService.getAllWatchlists();
     }
