@@ -1,8 +1,12 @@
 package com.bkb.restservice.controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.clients.Back4AppClient;
+import com.bkb.restservice.models.WatchlistsResponse;
+import com.bkb.restservice.services.StockPriceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +29,14 @@ public class WatchlistsController {
     @PutMapping("/watchlist/enable")
     public CompletionStage<Void> enableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
         return watchlistService.enableWatchlist(watchlistName);
+    }
+
+    //DELETE endpoint for disable. Accepts watchlist name just like enable endpoint
+    // First. Get the object id for watchlist name. Query EnabledWatchlists table with watchlist name
+    // Second. Delete the row in EnabledWatchlists using the object id
+    @DeleteMapping("watchlist/disable")
+    public CompletionStage<Void> disableWatchlist(@RequestParam(value = "watchlistName") String watchlistName){
+        return watchlistService.disableWatchlist(watchlistName);
     }
 
     @GetMapping("/watchlist/objectId")
@@ -96,6 +108,12 @@ public class WatchlistsController {
         return null;
         // return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
+    
+    @GetMapping("/watchlist/getWatchlistByIdName")
+    public WatchlistsResponse getWatchlistByIdName(@RequestParam(value ="name") String watchlistName ){
+        return watchlistService.getWatchlistIdByName(watchlistName);
+    }
 
 }
 
+//"localhost:8080/watchlist/getWatchlistByIdName?name=Shoes"

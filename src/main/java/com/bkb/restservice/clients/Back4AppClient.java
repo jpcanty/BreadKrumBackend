@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.models.WatchlistsResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,8 @@ public class Back4AppClient {
     private RestClient restClient;
     private static final String BACK_4_APP_APPLICATION_ID = "19FwHl4gMBw72qM8OHaGyCgm038AjHznnh4E5Wmz";
     private static final String BACK_4_APP_REST_API_KEY = "URGqznPEwDMGaPmkyCJMbx7SCtvCOfDWPlvp26gF";
-
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public CompletionStage<ResponseEntity<Void>> postWatchlistFuture(Watchlist watchlist) {
         return CompletableFuture.supplyAsync(() -> {
@@ -112,5 +115,37 @@ public class Back4AppClient {
                         .toBodilessEntity();
             });
         }
+
+        public CompletionStage<ResponseEntity<Void>> disableWatchlist(String watchlistName){
+            //getWAtchlistByName <----
+            // delete watchlist with object id
+            return null;
+        }
+        public WatchlistsResponse getAllWatchlists() {
+            try {
+
+
+                // 3. Execute the GET request using RestClient
+                WatchlistsResponse apiResponse = restClient.get()
+                        .uri("https://parseapi.back4app.com/classes/" + "Watchlist3")
+                        .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
+                        .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
+                        .retrieve()
+                        .body(WatchlistsResponse.class);
+
+                // 4. Extract the objectId safely
+//                if (apiResponse != null && apiResponse.results() != null && !apiResponse.results().isEmpty()) {
+//                    String objectId = apiResponse.results().get(0).objectId();
+//                    return new WatchlistIdResponse(objectId);
+//                }
+
+                return apiResponse;
+
+            } catch (Exception e) {
+                // In a production app, log this cleanly or throw a custom exception
+                return new WatchlistsResponse(List.of());
+            }
+        }
+
 
 }

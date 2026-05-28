@@ -2,9 +2,11 @@ package com.bkb.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.models.WatchlistsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -136,5 +138,18 @@ public class WatchlistService {
     public CompletionStage<Void> enableWatchlist(String watchlistName) {
         // We call the back4app client to add watchlistName to EnabledWatchlists table
         return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {});
+    }
+    //
+    public CompletionStage<Void> disableWatchlist(String watchlistName) {
+        //String objectId = back4AppClient.getObjectId(watchlistName) <- EnabledWatchlists table
+        // back4appClient.disableWatchlist(objectId)
+        return null;
+    }
+    public WatchlistsResponse getWatchlistIdByName(String watchlistName){
+       return back4AppClient.getAllWatchlists();
+       // 1. stream results filter on watch list name
+        // 2. findAny -> Optional<WatchlistObjectId>
+        // 3. Get objectId
+        // change signature to return String
     }
 }
