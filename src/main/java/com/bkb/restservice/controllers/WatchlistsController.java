@@ -110,7 +110,7 @@ public class WatchlistsController {
     }
     
     @GetMapping("/watchlist/getWatchlistByIdName")
-    public WatchlistsResponse getWatchlistByIdName(@RequestParam(value ="name") String watchlistName ){
+    public String getWatchlistByIdName(@RequestParam(value ="name") String watchlistName ){
         return watchlistService.getWatchlistIdByName(watchlistName);
     }
 

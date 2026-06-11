@@ -3,9 +3,11 @@ package com.bkb.restservice.services;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.models.WatchlistObjectId;
 import com.bkb.restservice.models.WatchlistsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -142,14 +144,23 @@ public class WatchlistService {
     //
     public CompletionStage<Void> disableWatchlist(String watchlistName) {
         //String objectId = back4AppClient.getObjectId(watchlistName) <- EnabledWatchlists table
+        String objectID = getWatchlistIdByName(watchlistName);
         // back4appClient.disableWatchlist(objectId)
-        return null;
+       return back4AppClient.deleteWatchlist(objectID).thenAccept(response ->{});
+
     }
-    public WatchlistsResponse getWatchlistIdByName(String watchlistName){
-       return back4AppClient.getAllWatchlists();
+    public String getWatchlistIdByName(String watchlistName){
+        //watchlist response is coming from back4appclient
+       Optional<WatchlistObjectId> watchlistObjectId = back4AppClient.getAllEnabledWatchlists().results().stream().filter(watchlist->{
+            String name = watchlist.name();
+            return name.equals(watchlistName);
+        }).findAny();
+        String objectId = watchlistObjectId.orElseThrow().objectId();
        // 1. stream results filter on watch list name
+
         // 2. findAny -> Optional<WatchlistObjectId>
         // 3. Get objectId
         // change signature to return String
+        return objectId;
     }
 }
