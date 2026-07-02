@@ -16,7 +16,9 @@ public class BookService {
     }
 
     public List<Book> getBooks() {
-        return repository.dumpAllBooks();
+        List <Book> books = repository.dumpAllBooks();
+        System.out.println();
+        return books;
     }
 
     public Book create(Book book) {
