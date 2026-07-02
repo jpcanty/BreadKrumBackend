@@ -2,12 +2,17 @@ package com.bkb.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.models.WatchlistObjectId;
+import com.bkb.restservice.models.WatchlistsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.bkb.restservice.clients.Back4AppClient;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
 
@@ -16,9 +21,15 @@ import java.util.stream.Collectors;
 @Service
 public class WatchlistService {
     @Autowired
+    private Back4AppClient back4AppClient;
+    @Autowired
     private WatchlistRepository watchlistRepository;
     @Autowired
     private StockPriceService stockPriceService;
+
+    public CompletionStage<String> getWatchlistObjectId(String watchlistName) {
+        return back4AppClient.getWatchlistObjectId(watchlistName);
+    }
 
     public CompletionStage<List<Watchlist>> getAllWatchlists() {
 //        return watchlistRepository.getAllWatchlists().thenCompose(this::hydrate);
@@ -118,12 +129,38 @@ public class WatchlistService {
         List<CompletionStage<String>> futures = Arrays.stream(watchlists)
                 // Get all watchlist assets
                 .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
-                        .thenApply(watchlistWithAssets -> {
-                            return stockPriceService.hydrateStockPrice(watchlistWithAssets);
-                        }).thenCompose(watchlistWithAssets -> watchlistRepository.postWatchlist(watchlistWithAssets)))
+                        .thenApply(stockPriceService::hydrateStockPrice)
+                        .thenCompose(watchlistWithAssets -> watchlistRepository.postWatchlist(watchlistWithAssets)))
                 .toList();
 
         // Combine list of futures into one future
         return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+    }
+
+    public CompletionStage<Void> enableWatchlist(String watchlistName) {
+        // We call the back4app client to add watchlistName to EnabledWatchlists table
+        return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {});
+    }
+    //
+    public CompletionStage<Void> disableWatchlist(String watchlistName) {
+        //String objectId = back4AppClient.getObjectId(watchlistName) <- EnabledWatchlists table
+        String objectID = getWatchlistIdByName(watchlistName);
+        // back4appClient.disableWatchlist(objectId)
+       return back4AppClient.deleteWatchlist(objectID).thenAccept(response ->{});
+
+    }
+    public String getWatchlistIdByName(String watchlistName){
+        //watchlist response is coming from back4appclient
+       Optional<WatchlistObjectId> watchlistObjectId = back4AppClient.getAllEnabledWatchlists().results().stream().filter(watchlist->{
+            String name = watchlist.name();
+            return name.equals(watchlistName);
+        }).findAny();
+        String objectId = watchlistObjectId.orElseThrow().objectId();
+       // 1. stream results filter on watch list name
+
+        // 2. findAny -> Optional<WatchlistObjectId>
+        // 3. Get objectId
+        // change signature to return String
+        return objectId;
     }
 }

@@ -1,22 +1,20 @@
 package com.bkb.restservice.controllers;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.clients.Back4AppClient;
+import com.bkb.restservice.models.WatchlistsResponse;
+import com.bkb.restservice.services.StockPriceService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.services.WatchlistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 // Controller is the entry into the backend service 
 @RestController
@@ -28,6 +26,24 @@ public class WatchlistsController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @PutMapping("/watchlist/enable")
+    public CompletionStage<Void> enableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
+        return watchlistService.enableWatchlist(watchlistName);
+    }
+
+    //DELETE endpoint for disable. Accepts watchlist name just like enable endpoint
+    // First. Get the object id for watchlist name. Query EnabledWatchlists table with watchlist name
+    // Second. Delete the row in EnabledWatchlists using the object id
+    @DeleteMapping("watchlist/disable")
+    public CompletionStage<Void> disableWatchlist(@RequestParam(value = "watchlistName") String watchlistName){
+        return watchlistService.disableWatchlist(watchlistName);
+    }
+
+    @GetMapping("/watchlist/objectId")
+    public CompletionStage<String> getWatchlistObjectId(@RequestParam(value = "watchlistName") String watchlistName) {
+        return watchlistService.getWatchlistObjectId(watchlistName);
+    }
+
     @GetMapping("/watchlists/all")
     public CompletionStage<List<Watchlist>> getAllWatchlists() {
         return watchlistService.getAllWatchlists();
@@ -36,9 +52,9 @@ public class WatchlistsController {
     /*
      * Create a new method at /watchlists/ that accepts a list of
      * strings as a param and limits the numbers of params to 10
-     * 
+     *
      * Input: ["Semiconductor ETF (Pseudo)", "08cecd42-aafb-42ce-b8d2-ab77a539388b"]
-     * 
+     *
      */
     @GetMapping("/watchlists")
     public CompletionStage<List<Watchlist>> get10Watchlists(@RequestParam(value = "params") List<String> params) {
@@ -92,6 +108,12 @@ public class WatchlistsController {
         return null;
         // return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
+    
+    @GetMapping("/watchlist/getWatchlistByIdName")
+    public String getWatchlistByIdName(@RequestParam(value ="name") String watchlistName ){
+        return watchlistService.getWatchlistIdByName(watchlistName);
+    }
 
 }
 
+//"localhost:8080/watchlist/getWatchlistByIdName?name=Shoes"

@@ -1,5 +1,6 @@
 .DS_Store
 .gradle
 .vs_code/
+.idea
 build
 bin
