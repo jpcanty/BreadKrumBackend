@@ -17,15 +17,8 @@ public class BookService {
         this.repository = repository;
     }
 
-<<<<<<< Updated upstream
-    public List<Book> getBooks() {
-        List <Book> books = repository.dumpAllBooks();
-        System.out.println();
-        return books;
-=======
     public List<BookRecord> getBooks() {
         return repository.dumpAllBooks().stream().map(Book::toRecord).toList();
->>>>>>> Stashed changes
     }
 
     public Book create(Book book) {
