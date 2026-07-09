@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.clients.Back4AppClient;
 import com.bkb.restservice.models.Watchlist;
-import com.bkb.restservice.repositories.WatchlistRepository;
+import com.bkb.restservice.repositories.Back4AppWatchlistRepository;
 
 import java.util.stream.Collectors;
 
@@ -23,7 +23,7 @@ public class WatchlistService {
     @Autowired
     private Back4AppClient back4AppClient;
     @Autowired
-    private WatchlistRepository watchlistRepository;
+    private Back4AppWatchlistRepository watchlistRepository;
     @Autowired
     private StockPriceService stockPriceService;
 
