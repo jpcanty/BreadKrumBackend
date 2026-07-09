@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bkb.restservice.models.Book;
+import com.bkb.restservice.models.Book.BookRecord;
 import com.bkb.restservice.services.BookService;
 
 @RestController
@@ -22,7 +23,7 @@ public class BookController {
     }
 
     @GetMapping
-    public List<Book> getBooks() {
+    public List<BookRecord> getBooks() {
         return service.getBooks();
     }
 
