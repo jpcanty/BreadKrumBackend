@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.bkb.restservice.clients.AlpacaClient;
 import com.bkb.restservice.clients.Back4AppClient;
 import com.bkb.restservice.models.StockPrice;
-import com.bkb.restservice.models.Watchlist;
+import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -26,7 +26,7 @@ record EnabledWatchlist(@JsonProperty("name") String name) {}
 record EnabledWatchlistsResponse(List<EnabledWatchlist> results){}
 
 @Repository
-public class Back4AppWatchlistRepository implements WatchlistRepository{
+public class Back4AppAndAlpacaWatchlistRepository implements WatchlistRepository{
     @Autowired
     private Back4AppClient back4AppClient;
     @Autowired
@@ -34,7 +34,7 @@ public class Back4AppWatchlistRepository implements WatchlistRepository{
     @Autowired
     private ObjectMapper objectMapper;
 
-    public CompletionStage<String> postWatchlist(Watchlist watchlist) {
+    public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
         return back4AppClient.postWatchlistFuture(watchlist).thenApply(response -> {
             Boolean isOk = response.getStatusCode() == HttpStatusCode.valueOf(201);
 
@@ -45,22 +45,22 @@ public class Back4AppWatchlistRepository implements WatchlistRepository{
         });
     }
 
-    public CompletionStage<Watchlist[]> getAllWatchlists() {
+    public CompletionStage<WatchlistRecord[]> getAllWatchlists() {
         return alpacaClient.getAllWatchlistsFuture().thenApply(response -> {
             try {
                 // Deserialize the response into Watchlist[]
-                return objectMapper.readValue(response, Watchlist[].class);
+                return objectMapper.readValue(response, WatchlistRecord[].class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException("Failed to process JSON response", e);
             }
         });
     }
 
-    public CompletionStage<Watchlist> getWatchlistById(String id) {
+    public CompletionStage<WatchlistRecord> getWatchlistById(String id) {
         return alpacaClient.getWatchlistByIdFuture(id).thenApply(response -> {
             try {
                 // Deserialize the response into Watchlist
-                return objectMapper.readValue(response, Watchlist.class);
+                return objectMapper.readValue(response, WatchlistRecord.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException("Failed to process JSON response", e);
             }

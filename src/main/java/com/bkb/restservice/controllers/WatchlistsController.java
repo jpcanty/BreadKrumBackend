@@ -1,17 +1,13 @@
 package com.bkb.restservice.controllers;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletionStage;
 
-import com.bkb.restservice.clients.Back4AppClient;
-import com.bkb.restservice.models.WatchlistsResponse;
-import com.bkb.restservice.services.StockPriceService;
+import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.bkb.restservice.models.StockPrice;
-import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.services.WatchlistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,7 +41,7 @@ public class WatchlistsController {
     }
 
     @GetMapping("/watchlists/all")
-    public CompletionStage<List<Watchlist>> getAllWatchlists() {
+    public CompletionStage<List<WatchlistRecord>> getAllWatchlists() {
         return watchlistService.getAllWatchlists();
     }
 
@@ -57,7 +53,7 @@ public class WatchlistsController {
      *
      */
     @GetMapping("/watchlists")
-    public CompletionStage<List<Watchlist>> get10Watchlists(@RequestParam(value = "params") List<String> params) {
+    public CompletionStage<List<WatchlistRecord>> get10Watchlists(@RequestParam(value = "params") List<String> params) {
         if (params.size() > 10) {
             // throw error
         }
@@ -66,14 +62,14 @@ public class WatchlistsController {
 
 
     @GetMapping("watchlists/subset")
-    public CompletionStage<List<Watchlist>>  getWatchlistSubset(){
+    public CompletionStage<List<WatchlistRecord>>  getWatchlistSubset(){
 
         return watchlistService.getWatchlistByEnabled();
     }
 
 
     @GetMapping("/watchlistId")
-    public CompletionStage<Watchlist> getWatchlistById(@RequestParam(value = "id", defaultValue = "") String id) {
+    public CompletionStage<WatchlistRecord> getWatchlistById(@RequestParam(value = "id", defaultValue = "") String id) {
         return watchlistService.getWatchlistById(id);
     }
 
@@ -81,18 +77,19 @@ public class WatchlistsController {
     // to object
     @PostMapping("/watchlist")
     public CompletionStage<String> postWatchlist(@RequestBody String entity) {
-        final Watchlist watchlist = buildWatchlistRequestEntity(entity);
+        final WatchlistRecord watchlist = buildWatchlistRequestEntity(entity);
         return watchlistService.postWatchlist(watchlist);
     }
 
+    // Use this to test SQL lite db change this is the curl (JUly 14, 2026
     @PostMapping("/watchlists")
     public CompletionStage<Void> postWatchlists() {
         return watchlistService.postAllWatchlists();
     }
 
-    private Watchlist buildWatchlistRequestEntity(String entity) {
+    private WatchlistRecord buildWatchlistRequestEntity(String entity) {
         try {
-            return objectMapper.readValue(entity, Watchlist.class);
+            return objectMapper.readValue(entity, WatchlistRecord.class);
         } catch (JsonProcessingException e) {
             System.out.println("Unable to parse watchlist " + entity);
             System.out.println(e);

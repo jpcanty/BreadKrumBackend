@@ -3,7 +3,6 @@ package com.bkb.restservice.services;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
 import com.bkb.restservice.models.Asset;
 import com.bkb.restservice.models.PriceHistory;
 import com.bkb.restservice.models.StockPrice;
-import com.bkb.restservice.models.Watchlist;
+import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 import com.bkb.restservice.repositories.StockPriceRepository;
 
 @Service
@@ -25,7 +24,7 @@ public class StockPriceService {
         return stockPriceRepository.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 
-    public Watchlist hydrateStockPrice(Watchlist watchlistWithAssets) {
+    public WatchlistRecord hydrateStockPrice(WatchlistRecord watchlistWithAssets) {
         Set<String> assetSymbols = watchlistWithAssets.assets().stream().map(Asset::symbol)
                 .collect(Collectors.toSet());
         StockPrice stockPrice = stockPriceRepository.getStockPriceHistoryBySymbols(assetSymbols, "1D")
@@ -37,7 +36,7 @@ public class StockPriceService {
                 })
                 .toList();
 
-        Watchlist newWatchlist = new Watchlist(
+        WatchlistRecord newWatchlist = new WatchlistRecord(
                 watchlistWithAssets.id(),
                 watchlistWithAssets.name(),
                 watchlistWithAssets.account_id(),

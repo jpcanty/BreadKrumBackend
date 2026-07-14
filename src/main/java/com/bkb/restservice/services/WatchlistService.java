@@ -2,19 +2,18 @@ package com.bkb.restservice.services;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.models.Watchlist.WatchlistRecord;
+
 import com.bkb.restservice.models.WatchlistObjectId;
-import com.bkb.restservice.models.WatchlistsResponse;
+import com.bkb.restservice.repositories.SQLiteWatchlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.clients.Back4AppClient;
-import com.bkb.restservice.models.Watchlist;
-import com.bkb.restservice.repositories.Back4AppWatchlistRepository;
 
 import java.util.stream.Collectors;
 
@@ -23,7 +22,7 @@ public class WatchlistService {
     @Autowired
     private Back4AppClient back4AppClient;
     @Autowired
-    private Back4AppWatchlistRepository watchlistRepository;
+    private SQLiteWatchlistRepository watchlistRepository;
     @Autowired
     private StockPriceService stockPriceService;
 
@@ -31,17 +30,17 @@ public class WatchlistService {
         return back4AppClient.getWatchlistObjectId(watchlistName);
     }
 
-    public CompletionStage<List<Watchlist>> getAllWatchlists() {
+    public CompletionStage<List<WatchlistRecord>> getAllWatchlists() {
 //        return watchlistRepository.getAllWatchlists().thenCompose(this::hydrate);
-        CompletionStage<Watchlist[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
+        CompletionStage<WatchlistRecord[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
         CompletionStage<List<String>> enabledWatchlistNamesFuture = watchlistRepository.getEnabledWatchlists();
 
         //TODO see how this would look with a thenCompose
         return allWatchlistsFuture.thenCombine(enabledWatchlistNamesFuture, (allWatchlists, enabledNames) ->{
-            List<Watchlist> updateWatchlists = Arrays.stream(allWatchlists)
+            List<WatchlistRecord> updateWatchlists = Arrays.stream(allWatchlists)
                     .map(watchlist -> {
                         boolean isEnabled = enabledNames.contains(watchlist.name());
-                        return new Watchlist(
+                        return new WatchlistRecord(
                                 watchlist.id(),
                                 watchlist.name(),
                                 watchlist.account_id(),
@@ -50,11 +49,11 @@ public class WatchlistService {
                         );
                     })
                     .collect(Collectors.toList());
-            return updateWatchlists.toArray(new Watchlist[0]);
+            return updateWatchlists.toArray(new WatchlistRecord[0]);
         } ). thenCompose( this::hydrate);
     }
 
-    public CompletionStage<List<Watchlist>> getWatchlistsByName(List<String> params) {
+    public CompletionStage<List<WatchlistRecord>> getWatchlistsByName(List<String> params) {
 
         return getAllWatchlists().thenApply(watchlists -> {
             return watchlists.stream()
@@ -70,17 +69,17 @@ public class WatchlistService {
         });
     }
 
-    public CompletionStage<List<Watchlist>> getWatchlistByEnabled(){
+    public CompletionStage<List<WatchlistRecord>> getWatchlistByEnabled(){
 
-        CompletionStage<Watchlist[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
+        CompletionStage<WatchlistRecord[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
         CompletionStage<List<String>> enabledWatchlistNamesFuture = watchlistRepository.getEnabledWatchlists();
 
         //TODO see how this would look with a thenCompose
         return allWatchlistsFuture.thenCombine(enabledWatchlistNamesFuture, (allWatchlists, enabledNames) ->{
-            List<Watchlist> updateWatchlists = Arrays.stream(allWatchlists)
+            List<WatchlistRecord> updateWatchlists = Arrays.stream(allWatchlists)
                     .map(watchlist -> {
                         boolean isEnabled = enabledNames.contains(watchlist.name());
-                        return new Watchlist(
+                        return new WatchlistRecord(
                                 watchlist.id(),
                                 watchlist.name(),
                                 watchlist.account_id(),
@@ -93,12 +92,12 @@ public class WatchlistService {
                         return isEnabled;
                     })
                     .collect(Collectors.toList());
-            return updateWatchlists.toArray(new Watchlist[0]);
+            return updateWatchlists.toArray(new WatchlistRecord[0]);
         } ). thenCompose( this::hydrate);
     }
 
-    private CompletionStage<List<Watchlist>> hydrate(Watchlist[] watchlists) {
-        List<CompletionStage<Watchlist>> futures = Arrays.stream(watchlists)
+    private CompletionStage<List<WatchlistRecord>> hydrate(WatchlistRecord[] watchlists) {
+        List<CompletionStage<WatchlistRecord>> futures = Arrays.stream(watchlists)
                 .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
                         .thenApply(watchlistWithAssets -> stockPriceService.hydrateStockPrice(watchlistWithAssets)))
                 .toList();
@@ -112,29 +111,33 @@ public class WatchlistService {
                         .toList());
     }
 
-    public CompletionStage<Watchlist> getWatchlistById(String id) {
+    public CompletionStage<WatchlistRecord> getWatchlistById(String id) {
         return watchlistRepository.getWatchlistById(id);
     }
 
-    public CompletionStage<String> postWatchlist(Watchlist watchlist) {
+    public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
         return watchlistRepository.postWatchlist(watchlist);
 
     }
 
+//    goes in here and then moves to 128
     public CompletionStage<Void> postAllWatchlists() {
+        //the .getAllWatchlists() is where our logic that connects to the rremote db lives
         return watchlistRepository.getAllWatchlists().thenCompose(this::postAllWatchlists);
     }
 
-    private CompletionStage<Void> postAllWatchlists(Watchlist[] watchlists) {
-        List<CompletionStage<String>> futures = Arrays.stream(watchlists)
-                // Get all watchlist assets
-                .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
-                        .thenApply(stockPriceService::hydrateStockPrice)
-                        .thenCompose(watchlistWithAssets -> watchlistRepository.postWatchlist(watchlistWithAssets)))
-                .toList();
-
-        // Combine list of futures into one future
-        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+//    this is a method that will show us our db (July 14,2026)
+    private CompletionStage<Void> postAllWatchlists(WatchlistRecord[] watchlists) {
+        return CompletableFuture.completedFuture(null);
+//        List<CompletionStage<String>> futures = Arrays.stream(watchlists)
+//                // Get all watchlist assets
+//                .map(watchlist -> watchlistRepository.getWatchlistById(watchlist.id())
+//                        .thenApply(stockPriceService::hydrateStockPrice)
+//                        .thenCompose(watchlistWithAssets -> watchlistRepository.postWatchlist(watchlistWithAssets)))
+//                .toList();
+//
+//        // Combine list of futures into one future
+//        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
     }
 
     public CompletionStage<Void> enableWatchlist(String watchlistName) {

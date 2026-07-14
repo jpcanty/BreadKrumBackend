@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import com.bkb.restservice.models.Asset;
-import com.bkb.restservice.models.Watchlist;
+import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 
 @Component
 public class Back4AppClient {
@@ -27,7 +27,7 @@ public class Back4AppClient {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public CompletionStage<ResponseEntity<Void>> postWatchlistFuture(Watchlist watchlist) {
+    public CompletionStage<ResponseEntity<Void>> postWatchlistFuture(WatchlistRecord watchlist) {
         return CompletableFuture.supplyAsync(() -> {
             String tableName = "Watchlist3";
             return restClient.post()
@@ -50,7 +50,7 @@ public class Back4AppClient {
             // }
 
         // .body(buildWatchlistBody(watchlist))
-        private Map<String, Object> buildWatchlistBody(Watchlist watchlist){
+        private Map<String, Object> buildWatchlistBody(WatchlistRecord watchlist){
 
             List<Asset> assets = watchlist.assets();
             Map<String,Object> theBody = new HashMap<>();
