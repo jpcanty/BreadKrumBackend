@@ -159,11 +159,7 @@ public class WatchlistService {
             return name.equals(watchlistName);
         }).findAny();
         String objectId = watchlistObjectId.orElseThrow().objectId();
-       // 1. stream results filter on watch list name
 
-        // 2. findAny -> Optional<WatchlistObjectId>
-        // 3. Get objectId
-        // change signature to return String
         return objectId;
     }
 }
