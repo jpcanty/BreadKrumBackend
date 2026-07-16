@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 
-public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepository<WatchlistRecord, Long> {
+public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepository<WatchlistRecord, String> {
     @Override
     public CompletionStage<String> postWatchlist(WatchlistRecord watchlist);
 

@@ -22,6 +22,7 @@ public class WatchlistService {
     @Autowired
     private Back4AppClient back4AppClient;
     @Autowired
+    //this is the line that connects the services to the SQLite db
     private SQLiteWatchlistRepository watchlistRepository;
     @Autowired
     private StockPriceService stockPriceService;
