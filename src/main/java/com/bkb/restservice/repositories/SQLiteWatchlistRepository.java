@@ -5,6 +5,7 @@ import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,8 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
     public List<Watchlist> getAllWatchlists();
         //in here we got to create the logic that outputs the watchlists in the database to our java{}
 
+    @Query ("SELECT b FROM Watchlist b WHERE b.account_id = :accountId")
+    public List<Watchlist> getWatchlistsByAccountId(@Param("accountId") String accountId);
 
     @Query("SELECT b FROM Watchlist b")
     public CompletionStage<WatchlistRecord> getWatchlistById(String id);

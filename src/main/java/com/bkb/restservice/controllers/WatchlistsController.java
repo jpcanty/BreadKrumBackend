@@ -111,6 +111,11 @@ public class WatchlistsController {
         return watchlistService.getWatchlistIdByName(watchlistName);
     }
 
+    @GetMapping("watchlists/accountId")
+    public CompletionStage<List<WatchlistRecord>> getWatchlistsByAccountId(@RequestParam(value = "accountId") String accountId) {
+        return watchlistService.getWatchlistByAccountId(accountId);
+    }
+
 }
 
 //"localhost:8080/watchlist/getWatchlistByIdName?name=Shoes"

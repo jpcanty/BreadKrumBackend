@@ -164,4 +164,10 @@ public class WatchlistService {
 
         return objectId;
     }
+    public CompletionStage<List<WatchlistRecord>> getWatchlistByAccountId(String accountId){
+        //
+        return CompletableFuture.completedFuture(watchlistRepository.getWatchlistsByAccountId(accountId)).thenApply( watchlist->{
+            return watchlist.stream().map(Watchlist::toRecord).toList();
+        });
+    }
 }
