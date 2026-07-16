@@ -3,6 +3,7 @@ package com.bkb.restservice.repositories;
 import java.util.Set;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.models.Watchlist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Repository;
@@ -45,15 +46,8 @@ public class Back4AppAndAlpacaWatchlistRepository implements WatchlistRepository
         });
     }
 
-    public CompletionStage<WatchlistRecord[]> getAllWatchlists() {
-        return alpacaClient.getAllWatchlistsFuture().thenApply(response -> {
-            try {
-                // Deserialize the response into Watchlist[]
-                return objectMapper.readValue(response, WatchlistRecord[].class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("Failed to process JSON response", e);
-            }
-        });
+    public List<Watchlist> getAllWatchlists() {
+        return null;
     }
 
     public CompletionStage<WatchlistRecord> getWatchlistById(String id) {
@@ -65,6 +59,11 @@ public class Back4AppAndAlpacaWatchlistRepository implements WatchlistRepository
                 throw new RuntimeException("Failed to process JSON response", e);
             }
         });
+    }
+
+    @Override
+    public List<Watchlist> getWatchlistsByAccountId(String accountId) {
+        return List.of();
     }
 
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {

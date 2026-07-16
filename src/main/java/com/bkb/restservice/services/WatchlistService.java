@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 
 import com.bkb.restservice.models.WatchlistObjectId;
@@ -33,12 +34,12 @@ public class WatchlistService {
 
     public CompletionStage<List<WatchlistRecord>> getAllWatchlists() {
 //        return watchlistRepository.getAllWatchlists().thenCompose(this::hydrate);
-        CompletionStage<WatchlistRecord[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
+        CompletionStage<List<Watchlist>>allWatchlistsFuture = CompletableFuture.completedFuture(watchlistRepository.getAllWatchlists());
         CompletionStage<List<String>> enabledWatchlistNamesFuture = watchlistRepository.getEnabledWatchlists();
 
         //TODO see how this would look with a thenCompose
         return allWatchlistsFuture.thenCombine(enabledWatchlistNamesFuture, (allWatchlists, enabledNames) ->{
-            List<WatchlistRecord> updateWatchlists = Arrays.stream(allWatchlists)
+            List<WatchlistRecord> updateWatchlists = allWatchlists.stream().map(Watchlist::toRecord)
                     .map(watchlist -> {
                         boolean isEnabled = enabledNames.contains(watchlist.name());
                         return new WatchlistRecord(
@@ -72,12 +73,12 @@ public class WatchlistService {
 
     public CompletionStage<List<WatchlistRecord>> getWatchlistByEnabled(){
 
-        CompletionStage<WatchlistRecord[]> allWatchlistsFuture = watchlistRepository.getAllWatchlists();
+        CompletionStage<List<Watchlist>> allWatchlistsFuture = CompletableFuture.completedFuture(watchlistRepository.getAllWatchlists());
         CompletionStage<List<String>> enabledWatchlistNamesFuture = watchlistRepository.getEnabledWatchlists();
 
         //TODO see how this would look with a thenCompose
         return allWatchlistsFuture.thenCombine(enabledWatchlistNamesFuture, (allWatchlists, enabledNames) ->{
-            List<WatchlistRecord> updateWatchlists = Arrays.stream(allWatchlists)
+            List<WatchlistRecord> updateWatchlists = allWatchlists.stream().map(Watchlist::toRecord)
                     .map(watchlist -> {
                         boolean isEnabled = enabledNames.contains(watchlist.name());
                         return new WatchlistRecord(
@@ -124,11 +125,11 @@ public class WatchlistService {
 //    goes in here and then moves to 128
     public CompletionStage<Void> postAllWatchlists() {
         //the .getAllWatchlists() is where our logic that connects to the rremote db lives
-        return watchlistRepository.getAllWatchlists().thenCompose(this::postAllWatchlists);
+        return CompletableFuture.completedFuture(watchlistRepository.getAllWatchlists()).thenCompose(this::postAllWatchlists);
     }
 
 //    this is a method that will show us our db (July 14,2026)
-    private CompletionStage<Void> postAllWatchlists(WatchlistRecord[] watchlists) {
+    private CompletionStage<Void> postAllWatchlists(List<Watchlist> watchlists) {
         return CompletableFuture.completedFuture(null);
 //        List<CompletionStage<String>> futures = Arrays.stream(watchlists)
 //                // Get all watchlist assets
