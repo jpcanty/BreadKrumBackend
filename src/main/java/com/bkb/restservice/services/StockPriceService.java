@@ -39,9 +39,11 @@ public class StockPriceService {
         WatchlistRecord newWatchlist = new WatchlistRecord(
                 watchlistWithAssets.id(),
                 watchlistWithAssets.name(),
-                watchlistWithAssets.account_id(),
+                watchlistWithAssets.accountId(),
                 newAssets,
-                true            );
+                true           ,
+            watchlistWithAssets.createdAt(),
+        watchlistWithAssets.updatedAt() );
         return newWatchlist;
     }
 
