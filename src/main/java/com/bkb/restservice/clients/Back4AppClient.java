@@ -1,5 +1,6 @@
 package com.bkb.restservice.clients;
 
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bkb.restservice.ApplicationConfiguration;
 import com.bkb.restservice.models.Asset;
@@ -35,9 +37,8 @@ public class Back4AppClient {
     private static final String BACK_4_APP_REST_API_KEY = "URGqznPEwDMGaPmkyCJMbx7SCtvCOfDWPlvp26gF";
     private static final String ENABLEDWATCHLIST_TABLE = "EnabledWatchlists";
 
-    public CompletionStage<Back4AppWatchlist> getWatchlistObjectId(String watchlistName) {
+    public CompletionStage<String> getWatchlistObjectId(String watchlistName) {
         return CompletableFuture.supplyAsync(() -> {
-            String watchList = "Watchlist3";
             String where;
             try {
                 where = objectMapper.writeValueAsString(
@@ -47,22 +48,25 @@ public class Back4AppClient {
                 e.printStackTrace();
                 throw new NullPointerException();
             }
-            
+
+            URI uri = UriComponentsBuilder.newInstance()
+                    .scheme("https")
+                    .host("parseapi.back4app.com")
+                    .path("/classes/Watchlist3")
+                    .queryParam("where", where)
+                    .build()
+                    .encode()
+                    .toUri();
+
             return restClient.get()
-                    .uri(builder -> builder
-                            .scheme("https")
-                            .host("parseapi.back4app.com")
-                            .path("/classes/{table}")
-                            .queryParam("where", URLEncoder.encode(
-                                    where,
-                                    StandardCharsets.UTF_8))
-                            .build(watchList))
+                    .uri(uri)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .retrieve()
                     .body(String.class);
-        }).thenApply(this::parseResponse).thenApply(Back4AppWatchlistsResponse::results).thenApply(List::stream)
-                .thenApply(stream -> stream.findAny().orElseThrow());
+        });
+        // .thenApply(this::parseResponse).thenApply(Back4AppWatchlistsResponse::results).thenApply(List::stream)
+        // .thenApply(stream -> stream.findAny().orElseThrow());
     }
 
     public CompletionStage<ResponseEntity<Void>> postWatchlistFuture(WatchlistRecord watchlist) {
@@ -202,6 +206,7 @@ public class Back4AppClient {
             return objectMapper.readValue(response, Back4AppWatchlistsResponse.class);
         } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
+            System.out.println(response);
             e.printStackTrace();
             throw new NullPointerException();
         }

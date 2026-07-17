@@ -38,7 +38,7 @@ public class WatchlistController {
     }
 
     @GetMapping("/watchlist/back4app/name")
-    public CompletionStage<Back4AppWatchlist> getWatchlistObjectId(@RequestParam(value = "watchlistName") String watchlistName) {
+    public CompletionStage<String> getWatchlistObjectId(@RequestParam(value = "watchlistName") String watchlistName) {
         return watchlistService.getWatchlistObjectId(watchlistName);
     }
 

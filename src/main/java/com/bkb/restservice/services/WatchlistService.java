@@ -43,7 +43,7 @@ public class WatchlistService {
         return alpacaClient.getWatchlistByIdFuture(id);
     }
     
-    public CompletionStage<Back4AppWatchlist> getWatchlistObjectId(String watchlistName) {
+    public CompletionStage<String> getWatchlistObjectId(String watchlistName) {
         return back4AppClient.getWatchlistObjectId(watchlistName);
     }
 
