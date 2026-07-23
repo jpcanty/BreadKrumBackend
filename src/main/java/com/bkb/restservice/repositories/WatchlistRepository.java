@@ -15,5 +15,5 @@ public interface WatchlistRepository {
 
     public List<Watchlist> getWatchlistsByAccountId(String accountId);
 
-    public CompletionStage<List<String>> getEnabledWatchlists();
+    public List<Watchlist> getEnabledWatchlists();
 }

@@ -1,8 +1,6 @@
 package com.bkb.restservice.clients;
 
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.bkb.restservice.ApplicationConfiguration;
 import com.bkb.restservice.models.Asset;
-import com.bkb.restservice.models.Back4AppWatchlist;
 import com.bkb.restservice.models.Watchlist.WatchlistRecord;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
@@ -35,24 +30,17 @@ public class Back4AppClient {
     private ObjectMapper objectMapper;
     private static final String BACK_4_APP_APPLICATION_ID = "19FwHl4gMBw72qM8OHaGyCgm038AjHznnh4E5Wmz";
     private static final String BACK_4_APP_REST_API_KEY = "URGqznPEwDMGaPmkyCJMbx7SCtvCOfDWPlvp26gF";
-    private static final String ENABLEDWATCHLIST_TABLE = "EnabledWatchlists";
+    private static final String ENABLED_WATCHLIST_TABLE = "EnabledWatchlists";
+    private static final String WATCCHLIST_TABLE = "Watchlist3";    
 
-    public CompletionStage<String> getWatchlistObjectId(String watchlistName) {
+    public CompletionStage<Back4AppWatchlistsResponse> getWatchlistObjectId(String watchlistName) {
         return CompletableFuture.supplyAsync(() -> {
-            String where;
-            try {
-                where = objectMapper.writeValueAsString(
-                        Map.of("name", watchlistName));
-            } catch (JsonProcessingException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                throw new NullPointerException();
-            }
+            String where = "{\"name\":\"" + watchlistName + "\"}";
 
             URI uri = UriComponentsBuilder.newInstance()
                     .scheme("https")
                     .host("parseapi.back4app.com")
-                    .path("/classes/Watchlist3")
+                    .path("/classes/" + WATCCHLIST_TABLE)
                     .queryParam("where", where)
                     .build()
                     .encode()
@@ -63,7 +51,7 @@ public class Back4AppClient {
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .retrieve()
-                    .body(String.class);
+                    .body(Back4AppWatchlistsResponse.class);
         });
         // .thenApply(this::parseResponse).thenApply(Back4AppWatchlistsResponse::results).thenApply(List::stream)
         // .thenApply(stream -> stream.findAny().orElseThrow());
@@ -71,9 +59,8 @@ public class Back4AppClient {
 
     public CompletionStage<ResponseEntity<Void>> postWatchlistFuture(WatchlistRecord watchlist) {
         return CompletableFuture.supplyAsync(() -> {
-            String tableName = "Watchlist3";
             return restClient.post()
-                    .uri("https://parseapi.back4app.com/classes/" + tableName)
+                    .uri("https://parseapi.back4app.com/classes/" + WATCCHLIST_TABLE)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -86,7 +73,7 @@ public class Back4AppClient {
     public CompletionStage<String> getEnabledWatchlistsFuture() {
         return CompletableFuture.supplyAsync(() -> {
             return restClient.get() // GET request
-                    .uri("https://parseapi.back4app.com/classes/" + ENABLEDWATCHLIST_TABLE)
+                    .uri("https://parseapi.back4app.com/classes/" + ENABLED_WATCHLIST_TABLE)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .retrieve() // execute the request
@@ -99,10 +86,9 @@ public class Back4AppClient {
     // {"name":"Shoes"}
 
     public CompletionStage<ResponseEntity<Void>> enableWatchlist(String watchlistName) {
-
         return CompletableFuture.supplyAsync(() -> {
             return restClient.post()
-                    .uri("https://parseapi.back4app.com/classes/" + ENABLEDWATCHLIST_TABLE)
+                    .uri("https://parseapi.back4app.com/classes/" + ENABLED_WATCHLIST_TABLE)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -113,10 +99,9 @@ public class Back4AppClient {
     }
 
     public CompletionStage<ResponseEntity<Void>> deleteWatchlist(String objectId) {
-        // delete watchlist with object id
         return CompletableFuture.supplyAsync(() -> {
             return restClient.delete()
-                    .uri("https://parseapi.back4app.com/classes/" + ENABLEDWATCHLIST_TABLE + "/" + objectId)
+                    .uri("https://parseapi.back4app.com/classes/" + ENABLED_WATCHLIST_TABLE + "/" + objectId)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .retrieve()
@@ -126,24 +111,12 @@ public class Back4AppClient {
 
     public Back4AppWatchlistsResponse getAllWatchlists() {
         try {
-
-            // 3. Execute the GET request using RestClient
-            Back4AppWatchlistsResponse apiResponse = restClient.get()
-                    .uri("https://parseapi.back4app.com/classes/" + "Watchlist3")
+            return restClient.get()
+                    .uri("https://parseapi.back4app.com/classes/" + WATCCHLIST_TABLE)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .retrieve()
                     .body(Back4AppWatchlistsResponse.class);
-
-            // 4. Extract the objectId safely
-            // if (apiResponse != null && apiResponse.results() != null &&
-            // !apiResponse.results().isEmpty()) {
-            // String objectId = apiResponse.results().get(0).objectId();
-            // return new WatchlistIdResponse(objectId);
-            // }
-
-            return apiResponse;
-
         } catch (Exception e) {
             // In a production app, log this cleanly or throw a custom exception
             return new Back4AppWatchlistsResponse(List.of());
@@ -152,24 +125,12 @@ public class Back4AppClient {
 
     public Back4AppWatchlistsResponse getAllEnabledWatchlists() {
         try {
-
-            // 3. Execute the GET request using RestClient
-            Back4AppWatchlistsResponse apiResponse = restClient.get()
-                    .uri("https://parseapi.back4app.com/classes/" + ENABLEDWATCHLIST_TABLE)
+            return restClient.get()
+                    .uri("https://parseapi.back4app.com/classes/" + ENABLED_WATCHLIST_TABLE)
                     .header("X-Parse-Application-Id", BACK_4_APP_APPLICATION_ID)
                     .header("X-Parse-REST-API-Key", BACK_4_APP_REST_API_KEY)
                     .retrieve()
                     .body(Back4AppWatchlistsResponse.class);
-
-            // 4. Extract the objectId safely
-            // if (apiResponse != null && apiResponse.results() != null &&
-            // !apiResponse.results().isEmpty()) {
-            // String objectId = apiResponse.results().get(0).objectId();
-            // return new WatchlistIdResponse(objectId);
-            // }
-
-            return apiResponse;
-
         } catch (Exception e) {
             // In a production app, log this cleanly or throw a custom exception
             return new Back4AppWatchlistsResponse(List.of());
@@ -189,27 +150,4 @@ public class Back4AppClient {
         }
         return theBody;
     }
-
-    List<Back4AppWatchlist> parseListResponse(String response) {
-        try {
-            return objectMapper.readValue(response, new TypeReference<List<Back4AppWatchlist>>() {
-            });
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return List.of();
-        }
-    }
-
-    Back4AppWatchlistsResponse parseResponse(String response) {
-        try {
-            return objectMapper.readValue(response, Back4AppWatchlistsResponse.class);
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            System.out.println(response);
-            e.printStackTrace();
-            throw new NullPointerException();
-        }
-    }
-
 }

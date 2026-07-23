@@ -24,6 +24,24 @@ public class WatchlistController {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @GetMapping("watchlist/enabled")
+    public CompletionStage<List<WatchlistRecord>> getWatchlistSubset() {
+        return watchlistService.getEnabledWatchlists();
+    }
+
+    // posting watchlist to the frontend use ObjectMapper objectMapper turns string
+    // to object
+    @PostMapping("/watchlist")
+    public CompletionStage<String> postWatchlist(@RequestBody String entity) {
+        final WatchlistRecord watchlist = buildWatchlistRequestEntity(entity);
+        return watchlistService.postWatchlist(watchlist);
+    }
+
+    @PostMapping("/watchlist/all")
+    public CompletionStage<Void> postWatchlists() {
+        return watchlistService.postAllWatchlists();
+    }
+
     @GetMapping("/watchlist/alpaca/all")
     public CompletionStage<List<AlpacaWatchlist>> getAllAlpacaWatchlists() {
         return watchlistService.getAllAlpacaWatchlists();
@@ -37,47 +55,17 @@ public class WatchlistController {
         return watchlistService.getAlpacaWatchlistById(id);
     }
 
-    @GetMapping("/watchlist/back4app/name")
-    public CompletionStage<String> getWatchlistObjectId(@RequestParam(value = "watchlistName") String watchlistName) {
-        return watchlistService.getWatchlistObjectId(watchlistName);
-    }
-
-    @PutMapping("/watchlist/enable")
-    public CompletionStage<Void> enableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
-        return watchlistService.enableWatchlist(watchlistName);
-    }
-
-    @DeleteMapping("watchlist/disable")
-    public CompletionStage<Void> disableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
-        return watchlistService.disableWatchlist(watchlistName);
-    }
-    
-
-    @GetMapping("/watchlists")
-    public CompletionStage<List<WatchlistRecord>> get10Watchlists(@RequestParam(value = "params") List<String> params) {
+    @GetMapping("/watchlist/alpaca/search")
+    public CompletionStage<List<AlpacaWatchlist>> get10Watchlists(@RequestParam(value = "params") List<String> params) {
         if (params.size() > 10) {
-            // throw error
+            throw new NullPointerException();
         }
-        return watchlistService.getWatchlistsByName(params);
+        return watchlistService.getAlpacaWatchlistsByParam(params);
     }
 
-    @GetMapping("watchlists/subset")
-    public CompletionStage<List<WatchlistRecord>> getWatchlistSubset() {
-        return watchlistService.getWatchlistByEnabled();
-    }
-
-    // posting watchlist to the frontend use ObjectMapper objectMapper turns string
-    // to object
-    @PostMapping("/watchlist")
-    public CompletionStage<String> postWatchlist(@RequestBody String entity) {
-        final WatchlistRecord watchlist = buildWatchlistRequestEntity(entity);
-        return watchlistService.postWatchlist(watchlist);
-    }
-
-    // Use this to test SQL lite db change this is the curl (JUly 14, 2026
-    @PostMapping("/watchlists")
-    public CompletionStage<Void> postWatchlists() {
-        return watchlistService.postAllWatchlists();
+    @GetMapping("/watchlist/back4app/name")
+    public CompletionStage<Back4AppWatchlist> getWatchlistObjectId(@RequestParam(value = "watchlistName") String watchlistName) {
+        return watchlistService.getWatchlistObjectId(watchlistName);
     }
 
     private WatchlistRecord buildWatchlistRequestEntity(String entity) {
@@ -109,5 +97,16 @@ public class WatchlistController {
             @RequestParam(value = "accountId") String accountId) {
         return watchlistService.getWatchlistByAccountId(accountId);
     }
+
+    @PutMapping("/watchlist/enable")
+    public CompletionStage<Void> enableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
+        return watchlistService.enableWatchlist(watchlistName);
+    }
+
+    @DeleteMapping("watchlist/disable")
+    public CompletionStage<Void> disableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
+        return watchlistService.disableWatchlist(watchlistName);
+    }
+    
 
 }

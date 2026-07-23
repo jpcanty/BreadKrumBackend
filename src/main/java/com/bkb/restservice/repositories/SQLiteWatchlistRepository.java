@@ -28,5 +28,5 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
     public CompletionStage<WatchlistRecord> getWatchlistById(String id);
 
     @Query("SELECT b FROM Watchlist b")
-    public CompletionStage<List<String>> getEnabledWatchlists();
+    public List<Watchlist> getEnabledWatchlists();
 }
