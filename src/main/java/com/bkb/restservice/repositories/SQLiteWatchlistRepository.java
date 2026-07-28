@@ -19,14 +19,13 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
 
     @Query("SELECT b FROM Watchlist b")
     public List<Watchlist> getAllWatchlists();
-        //in here we got to create the logic that outputs the watchlists in the database to our java{}
 
     @Query ("SELECT b FROM Watchlist b WHERE b.accountId = :accountId")
     public List<Watchlist> getWatchlistsByAccountId(@Param("accountId") String accountId);
 
-    @Query("SELECT b FROM Watchlist b")
-    public CompletionStage<WatchlistRecord> getWatchlistById(String id);
+    @Query("SELECT b FROM Watchlist b WHERE b.name = :name")
+    public CompletionStage<WatchlistRecord> getWatchlistByIdName(@Param( "name") String name);
 
-    @Query("SELECT b FROM Watchlist b")
+    @Query("SELECT b FROM Watchlist b WHERE b.enabled =  1")
     public List<Watchlist> getEnabledWatchlists();
 }

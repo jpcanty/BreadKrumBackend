@@ -24,17 +24,23 @@ public class WatchlistController {
     @Autowired
     private ObjectMapper objectMapper;
 
+//    this one is connected to line 31 in the SQLiteWatchlist Repository file
     @GetMapping("watchlist/enabled")
     public CompletionStage<List<WatchlistRecord>> getWatchlistSubset() {
         return watchlistService.getEnabledWatchlists();
     }
 
-    // posting watchlist to the frontend use ObjectMapper objectMapper turns string
-    // to object
+    // this is connected to line 18 in the SQLiteWatchlist Repository file
     @PostMapping("/watchlist")
     public CompletionStage<String> postWatchlist(@RequestBody String entity) {
         final WatchlistRecord watchlist = buildWatchlistRequestEntity(entity);
         return watchlistService.postWatchlist(watchlist);
+    }
+    //for the getAllWatchlists() on sqliteWatchlistRepository
+    @GetMapping("/watchlist")
+    public CompletionStage<List<WatchlistRecord>>getAllWatchlists(){
+        return watchlistService.getAllWatchlists();
+        //follow the paths from here till you get to sqlite use the post watchlist as an example. 
     }
 
     @PostMapping("/watchlist/all")
@@ -87,14 +93,14 @@ public class WatchlistController {
         // return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 
+    //this will be connected to line 27 in sqlitewatchlistRepository.java file
     @GetMapping("/watchlist/getWatchlistByIdName")
     public String getWatchlistByIdName(@RequestParam(value = "name") String watchlistName) {
         return watchlistService.getWatchlistIdByName(watchlistName);
     }
-
+    //this is the one we worked on last meeting.
     @GetMapping("watchlists/accountId")
-    public CompletionStage<List<WatchlistRecord>> getWatchlistsByAccountId(
-            @RequestParam(value = "accountId") String accountId) {
+    public CompletionStage<List<WatchlistRecord>> getWatchlistsByAccountId( @RequestParam(value = "accountId") String accountId) {
         return watchlistService.getWatchlistByAccountId(accountId);
     }
 
