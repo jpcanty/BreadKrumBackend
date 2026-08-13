@@ -1,9 +1,10 @@
 package com.bkb.restservice.models;
 import jakarta.persistence.*;
 
+import java.time.Instant;
 import java.util.List;
 @Entity
-@Table( name = "watchlist")
+@Table( name = "watchlists")
 public class Watchlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -11,14 +12,18 @@ public class Watchlist {
 
     private String name;
 
-    private String account_id;
+    private String accountId;
 
     private boolean enabled;
 
-    public record WatchlistRecord(String id, String name, String account_id, List<Asset> assets, boolean enabled) {}
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    public record WatchlistRecord(String id, String name, String accountId, List<Asset> assets, boolean enabled, String createdAt, String updatedAt) {}
 
     public static WatchlistRecord toRecord( Watchlist watchlist){
-        return new WatchlistRecord( watchlist.getId(), watchlist.getName(), watchlist.getAccountId(), List.of(), watchlist.getEnabled() );
+        return new WatchlistRecord( watchlist.getId(), watchlist.getName(), watchlist.getAccountId(), List.of(), watchlist.getEnabled(), watchlist.getCreatedAt().toString(), watchlist.getUpdatedAt().toString());
      }
      String getId(){
         return id;
@@ -27,9 +32,15 @@ public class Watchlist {
         return name;
      }
      String getAccountId(){
-        return account_id;
+        return accountId;
      }
      boolean getEnabled(){
         return enabled;
+     }
+     Instant getCreatedAt(){
+      return createdAt;
+     }
+     Instant getUpdatedAt() {
+      return updatedAt;
      }
 }

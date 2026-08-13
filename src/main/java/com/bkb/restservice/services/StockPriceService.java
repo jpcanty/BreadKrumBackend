@@ -7,27 +7,35 @@ import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.bkb.restservice.ApplicationConfiguration;
+import com.bkb.restservice.clients.AlpacaClient;
 import com.bkb.restservice.models.Asset;
 import com.bkb.restservice.models.PriceHistory;
 import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.models.Watchlist.WatchlistRecord;
-import com.bkb.restservice.repositories.StockPriceRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class StockPriceService {
     @Autowired
-    private StockPriceRepository stockPriceRepository;
+    private AlpacaClient alpacaClient;
+    @Autowired
+    @Qualifier(ApplicationConfiguration.ALPACA_OBJECT_MAPPER)
+    private ObjectMapper objectMapper;
+
 
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(String symbol, String timeframe) {
-        return stockPriceRepository.getStockPriceHistoryBySymbol(symbol, timeframe);
+        return getStockPriceHistoryBySymbol2(symbol, timeframe);
     }
 
     public WatchlistRecord hydrateStockPrice(WatchlistRecord watchlistWithAssets) {
         Set<String> assetSymbols = watchlistWithAssets.assets().stream().map(Asset::symbol)
                 .collect(Collectors.toSet());
-        StockPrice stockPrice = stockPriceRepository.getStockPriceHistoryBySymbols(assetSymbols, "1D")
+        StockPrice stockPrice = getStockPriceHistoryBySymbols(assetSymbols, "1D")
                 .toCompletableFuture()
                 .join();
         List<Asset> newAssets = watchlistWithAssets.assets().stream()
@@ -39,9 +47,11 @@ public class StockPriceService {
         WatchlistRecord newWatchlist = new WatchlistRecord(
                 watchlistWithAssets.id(),
                 watchlistWithAssets.name(),
-                watchlistWithAssets.account_id(),
+                watchlistWithAssets.accountId(),
                 newAssets,
-                true            );
+                true           ,
+            watchlistWithAssets.createdAt(),
+        watchlistWithAssets.updatedAt() );
         return newWatchlist;
     }
 
@@ -73,5 +83,30 @@ public class StockPriceService {
             return 0.0;
         double pct = (close - open) / open;
         return Math.round(pct * 10000.0) / 10000.0;
+    }
+
+
+
+    public CompletionStage<StockPrice> getStockPriceHistoryBySymbols(Set<String> symbols, String timeframe) {
+        return alpacaClient.getStockPriceHistoryBySymbolsFuture(symbols, timeframe).thenApply(response -> {
+            try {
+                System.out.println(response);
+                // Deserialize the response into Watchlist
+                return objectMapper.readValue(response, StockPrice.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to process JSON response", e);
+            }
+        });
+    }
+
+    public CompletionStage<StockPrice> getStockPriceHistoryBySymbol2(String symbol, String timeframe) {
+        return alpacaClient.getStockPriceHistoryBySymbolsFuture(Set.of(symbol), timeframe).thenApply(response -> {
+            try {
+                // Deserialize the response into Watchlist
+                return objectMapper.readValue(response, StockPrice.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to process JSON response", e);
+            }
+        });
     }
 }
