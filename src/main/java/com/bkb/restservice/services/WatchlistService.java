@@ -76,8 +76,9 @@ public class WatchlistService {
         return watchlists.stream().map(Watchlist::toRecord).toList();
     }
 
-    public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
-        return watchlistRepository.postWatchlist(watchlist);
+        public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
+            watchlistRepository.postWatchlist(watchlist.id(),watchlist.name(), watchlist.accountId(),watchlist.enabled(),watchlist.createdAt(), watchlist.updatedAt());
+            return CompletableFuture.completedFuture("");
 
     }
 
@@ -103,6 +104,7 @@ public class WatchlistService {
     }
 
     public CompletionStage<Void> enableWatchlist(String watchlistName) {
+        // watchlistRepository.enableWatchlist(watchlistName)
         return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {
         });
     }
@@ -111,7 +113,7 @@ public class WatchlistService {
     public CompletionStage<Void> disableWatchlist(String watchlistName) {
         // String objectId = back4AppClient.getObjectId(watchlistName) <-
         // EnabledWatchlists table
-        // back4appClient.disableWatchlist(objectId)
+        // watchlistRepository.disableWatchlist(watchlistName)
         return getWatchlistIdByName(watchlistName).thenCompose( objectID -> back4AppClient.deleteWatchlist(objectID)).thenAccept(response -> {
         });
 

@@ -7,7 +7,7 @@ import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 
 public interface WatchlistRepository {
-    public CompletionStage<String> postWatchlist(WatchlistRecord watchlist);
+    public void postWatchlist(String id, String name, String accountId, boolean enabled, String createdAt, String updatedAt);
     
     public List<Watchlist> getAllWatchlists();
 

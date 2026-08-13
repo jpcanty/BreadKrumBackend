@@ -7,8 +7,7 @@ import java.util.concurrent.CompletionStage;
 
 public class DummyWatchlistRepository implements WatchlistRepository{
     @Override
-    public CompletionStage<String> postWatchlist(Watchlist.WatchlistRecord watchlist) {
-        return null;
+    public void postWatchlist(String id, String name, String accountId, boolean enabled, String createdAt, String updatedAt) {
     }
 
     @Override
