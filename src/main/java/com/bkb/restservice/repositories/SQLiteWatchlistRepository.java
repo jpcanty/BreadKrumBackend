@@ -14,18 +14,24 @@ import java.util.concurrent.CompletionStage;
 
 @Component(ApplicationConfiguration.SQLITE_RESPOSITORY)
 public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepository<Watchlist, String> {
+    @Override
     @Query("SELECT b FROM Watchlist b")
     public CompletionStage<String> postWatchlist(WatchlistRecord watchlist);
 
+    @Override
     @Query("SELECT b FROM Watchlist b")
     public List<Watchlist> getAllWatchlists();
 
+
+    @Override
     @Query ("SELECT b FROM Watchlist b WHERE b.accountId = :accountId")
     public List<Watchlist> getWatchlistsByAccountId(@Param("accountId") String accountId);
 
+    @Override
     @Query("SELECT b FROM Watchlist b WHERE b.name = :name")
     public CompletionStage<WatchlistRecord> getWatchlistByIdName(@Param( "name") String name);
 
-    @Query("SELECT b FROM Watchlist b WHERE b.enabled =  1")
+    @Override
+    @Query("SELECT b FROM Watchlist b WHERE b.enabled =  true")
     public List<Watchlist> getEnabledWatchlists();
 }

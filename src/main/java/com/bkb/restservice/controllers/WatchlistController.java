@@ -93,10 +93,10 @@ public class WatchlistController {
         // return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 
-    //this will be connected to line 27 in sqlitewatchlistRepository.java file
+    //this will be connected to line 31 in sqlitewatchlistRepository.java file
     @GetMapping("/watchlist/getWatchlistByIdName")
     public String getWatchlistByIdName(@RequestParam(value = "name") String watchlistName) {
-        return watchlistService.getWatchlistIdByName(watchlistName);
+        return watchlistService.getWatchlistIdByName(watchlistName).toString();
     }
     //this is the one we worked on last meeting.
     @GetMapping("watchlists/accountId")

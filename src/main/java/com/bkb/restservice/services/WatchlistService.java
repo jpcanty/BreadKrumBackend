@@ -111,23 +111,23 @@ public class WatchlistService {
     public CompletionStage<Void> disableWatchlist(String watchlistName) {
         // String objectId = back4AppClient.getObjectId(watchlistName) <-
         // EnabledWatchlists table
-        String objectID = getWatchlistIdByName(watchlistName);
         // back4appClient.disableWatchlist(objectId)
-        return back4AppClient.deleteWatchlist(objectID).thenAccept(response -> {
+        return getWatchlistIdByName(watchlistName).thenCompose( objectID -> back4AppClient.deleteWatchlist(objectID)).thenAccept(response -> {
         });
 
     }
 
-    public String getWatchlistIdByName(String watchlistName) {
+    public CompletionStage<String> getWatchlistIdByName(String watchlistName) {
         // watchlist response is coming from back4appclient
-        Optional<Back4AppWatchlist> watchlistObjectId = back4AppClient.getAllEnabledWatchlists().results().stream()
-                .filter(watchlist -> {
-                    String name = watchlist.name();
-                    return name.equals(watchlistName);
-                }).findAny();
-        String objectId = watchlistObjectId.orElseThrow().objectId();
-
-        return objectId;
+//        Optional<Back4AppWatchlist> watchlistObjectId = back4AppClient.getAllEnabledWatchlists().results().stream()
+//                .filter(watchlist -> {
+//                    String name = watchlist.name();
+//                    return name.equals(watchlistName);
+//                }).findAny();
+//        String objectId = watchlistObjectId.orElseThrow().objectId();
+//
+//        return objectId;
+        return watchlistRepository.getWatchlistByIdName(watchlistName).thenApply(WatchlistRecord::id);
     }
 
     public CompletionStage<List<WatchlistRecord>> getWatchlistByAccountId(String accountId) {
