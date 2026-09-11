@@ -76,7 +76,7 @@ public class WatchlistService {
         return watchlists.stream().map(Watchlist::toRecord).toList();
     }
 
-        public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
+    public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
             watchlistRepository.postWatchlist(watchlist.id(),watchlist.name(), watchlist.accountId(),watchlist.enabled(),watchlist.createdAt(), watchlist.updatedAt());
             return CompletableFuture.completedFuture("");
 
@@ -88,7 +88,6 @@ public class WatchlistService {
 
     }
 
-    // this is a method that will show us our db (July 14,2026)
     private CompletionStage<Void> postAllWatchlists(List<Watchlist> watchlists) {
         return CompletableFuture.completedFuture(null);
         // List<CompletionStage<String>> futures = Arrays.stream(watchlists)
@@ -104,9 +103,10 @@ public class WatchlistService {
     }
 
     public CompletionStage<Void> enableWatchlist(String watchlistName) {
-        // watchlistRepository.enableWatchlist(watchlistName)
-        return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {
-        });
+        watchlistRepository.enableWatchlist(watchlistName);
+        return CompletableFuture.completedFuture(null ).thenAccept(response -> {});
+//        return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {
+//        });
     }
 
     //

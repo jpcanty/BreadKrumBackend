@@ -44,7 +44,7 @@ public class WatchlistController {
     }
 
     @PostMapping("/watchlist/all")
-    public CompletionStage<Void> postWatchlist() {
+    public CompletionStage<Void> postWatchlists() {
         return watchlistService.postAllWatchlists();
     }
 

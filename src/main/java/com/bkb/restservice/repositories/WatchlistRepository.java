@@ -16,4 +16,7 @@ public interface WatchlistRepository {
     public List<Watchlist> getWatchlistsByAccountId(String accountId);
 
     public List<Watchlist> getEnabledWatchlists();
+
+    //one of the params has to be a watchlist (get string watchlist name
+    public void enableWatchlist(String name);
 }

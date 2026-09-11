@@ -29,4 +29,8 @@ public class DummyWatchlistRepository implements WatchlistRepository{
     public List<Watchlist> getEnabledWatchlists() {
         return List.of();
     }
+
+    @Override
+    public void enableWatchlist(String name) {
+    }
 }
