@@ -20,13 +20,19 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
     @Modifying
     @Transactional
     @Query("INSERT INTO Watchlist (id, name, accountId , enabled, createdAt, updatedAt ) VALUES(:id, :name , :accountId , :enabled, :createdAt,:updatedAt)")
-    public void postWatchlist(@Param("id")String id ,@Param("name") String name, @Param("accountId") String accountId,@Param("enabled") boolean enabled, @Param("createdAt") String createdAt, @Param("updatedAt")String updatedAt);
+    public void insertWatchlist(@Param("id")String id ,@Param("name") String name, @Param("accountId") String accountId,@Param("enabled") boolean enabled, @Param("createdAt") String createdAt, @Param("updatedAt")String updatedAt);
 
     @Override
     @Modifying
     @Transactional
     @Query("UPDATE Watchlist b SET b.enabled =  true  WHERE b.name = :name")
     public void enableWatchlist(@Param("name") String name);
+
+    @Override
+    @Modifying
+    @Transactional
+    @Query("UPDATE Watchlist b SET b.enabled =  false  WHERE b.name = :name")
+    public void disableWatchlist(@Param("name") String name);
 
     @Override
     @Query("SELECT b FROM Watchlist b")

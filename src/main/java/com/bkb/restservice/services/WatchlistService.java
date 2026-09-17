@@ -15,6 +15,7 @@ import com.bkb.restservice.repositories.WatchlistRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.ApplicationConfiguration;
@@ -77,14 +78,21 @@ public class WatchlistService {
     }
 
     public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
-            watchlistRepository.postWatchlist(watchlist.id(),watchlist.name(), watchlist.accountId(),watchlist.enabled(),watchlist.createdAt(), watchlist.updatedAt());
+            watchlistRepository.insertWatchlist(watchlist.id() , watchlist.name(), watchlist.accountId(), watchlist.enabled(), watchlist.createdAt(), watchlist.updatedAt());
             return CompletableFuture.completedFuture("");
 
     }
 
     public CompletionStage<Void> postAllWatchlists() {
-        CompletionStage<List<AlpacaWatchlist>> alpacaWatchlistsStage = getAllAlpacaWatchlists();
-        return getAllAlpacaWatchlists().thenAccept(null);
+            return getAllAlpacaWatchlists().thenCompose( watchlists-> {
+                List<CompletionStage<String>> futures = watchlists.stream()
+                        .map( Watchlist ::toRecord)
+                        .map(this::postWatchlist ).toList();
+
+                return CompletableFuture
+                    .allOf(futures.toArray(new CompletableFuture[0]));
+
+            });
 
     }
 
@@ -109,13 +117,10 @@ public class WatchlistService {
 //        });
     }
 
-    //
     public CompletionStage<Void> disableWatchlist(String watchlistName) {
-        // String objectId = back4AppClient.getObjectId(watchlistName) <-
-        // EnabledWatchlists table
-        // watchlistRepository.disableWatchlist(watchlistName)
-        return getWatchlistIdByName(watchlistName).thenCompose( objectID -> back4AppClient.deleteWatchlist(objectID)).thenAccept(response -> {
-        });
+
+        watchlistRepository.disableWatchlist(watchlistName);
+        return CompletableFuture.completedFuture(null).thenAccept(response -> {});
 
     }
 
