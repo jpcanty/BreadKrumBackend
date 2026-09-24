@@ -15,6 +15,7 @@ import com.bkb.restservice.repositories.WatchlistRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.ApplicationConfiguration;
@@ -77,17 +78,24 @@ public class WatchlistService {
     }
 
     public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
-        return watchlistRepository.postWatchlist(watchlist);
+            watchlistRepository.insertWatchlist(watchlist.id() , watchlist.name(), watchlist.accountId(), watchlist.enabled(), watchlist.createdAt(), watchlist.updatedAt());
+            return CompletableFuture.completedFuture("");
 
     }
 
     public CompletionStage<Void> postAllWatchlists() {
-        CompletionStage<List<AlpacaWatchlist>> alpacaWatchlistsStage = getAllAlpacaWatchlists();
-        return getAllAlpacaWatchlists().thenAccept(null);
+            return getAllAlpacaWatchlists().thenCompose( watchlists-> {
+                List<CompletionStage<String>> futures = watchlists.stream()
+                        .map( Watchlist ::toRecord)
+                        .map(this::postWatchlist ).toList();
+
+                return CompletableFuture
+                    .allOf(futures.toArray(new CompletableFuture[0]));
+
+            });
 
     }
 
-    // this is a method that will show us our db (July 14,2026)
     private CompletionStage<Void> postAllWatchlists(List<Watchlist> watchlists) {
         return CompletableFuture.completedFuture(null);
         // List<CompletionStage<String>> futures = Arrays.stream(watchlists)
@@ -103,17 +111,16 @@ public class WatchlistService {
     }
 
     public CompletionStage<Void> enableWatchlist(String watchlistName) {
-        return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {
-        });
+        watchlistRepository.enableWatchlist(watchlistName);
+        return CompletableFuture.completedFuture(null ).thenAccept(response -> {});
+//        return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {
+//        });
     }
 
-    //
     public CompletionStage<Void> disableWatchlist(String watchlistName) {
-        // String objectId = back4AppClient.getObjectId(watchlistName) <-
-        // EnabledWatchlists table
-        // back4appClient.disableWatchlist(objectId)
-        return getWatchlistIdByName(watchlistName).thenCompose( objectID -> back4AppClient.deleteWatchlist(objectID)).thenAccept(response -> {
-        });
+
+        watchlistRepository.disableWatchlist(watchlistName);
+        return CompletableFuture.completedFuture(null).thenAccept(response -> {});
 
     }
 
