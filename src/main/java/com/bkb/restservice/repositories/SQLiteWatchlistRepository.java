@@ -20,7 +20,7 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
     @Modifying
     @Transactional
     @Query("INSERT INTO Watchlist (id, name, accountId , enabled, createdAt, updatedAt ) VALUES(:id, :name , :accountId , :enabled, :createdAt,:updatedAt)")
-    public void insertWatchlist(@Param("id")String id ,@Param("name") String name, @Param("accountId") String accountId,@Param("enabled") boolean enabled, @Param("createdAt") String createdAt, @Param("updatedAt")String updatedAt);
+    public void insertWatchlist(@Param("id") String id, @Param("name") String name, @Param("accountId") String accountId, @Param("enabled") boolean enabled, @Param("createdAt") String createdAt, @Param("updatedAt") String updatedAt);
 
     @Override
     @Modifying
@@ -40,15 +40,21 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
 
 
     @Override
-    @Query ("SELECT b FROM Watchlist b WHERE b.accountId = :accountId")
+    @Query("SELECT b FROM Watchlist b WHERE b.accountId = :accountId")
     public List<Watchlist> getWatchlistsByAccountId(@Param("accountId") String accountId);
 
     @Override
     @Query("SELECT b FROM Watchlist b WHERE b.name = :name")
-    public CompletionStage<WatchlistRecord> getWatchlistByIdName(@Param( "name") String name);
+    public CompletionStage<WatchlistRecord> getWatchlistByIdName(@Param("name") String name);
 
     @Override
     @Query("SELECT b FROM Watchlist b WHERE b.enabled =  true")
     public List<Watchlist> getEnabledWatchlists();
+
+    //delete all empties out the items in the watchlist table
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Watchlist")
+    public void deleteAllWatchlists();
 
 }

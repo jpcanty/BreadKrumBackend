@@ -143,4 +143,9 @@ public class WatchlistService {
                     return watchlist.stream().map(Watchlist::toRecord).toList();
                 });
     }
+
+   public CompletionStage<Void> deleteAllWatchlists(){
+        watchlistRepository.deleteAllWatchlists();
+        return CompletableFuture.completedFuture(null).thenAccept(response -> {});
+   }
 }

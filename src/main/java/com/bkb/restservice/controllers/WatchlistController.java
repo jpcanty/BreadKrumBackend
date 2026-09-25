@@ -113,6 +113,10 @@ public class WatchlistController {
     public CompletionStage<Void> disableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
         return watchlistService.disableWatchlist(watchlistName);
     }
-    
+
+    @DeleteMapping("watchlist/deleteAllWatchlists")
+    public CompletionStage<Void> deleteAllWatchlists(){
+        return watchlistService.deleteAllWatchlists();
+    }
 
 }

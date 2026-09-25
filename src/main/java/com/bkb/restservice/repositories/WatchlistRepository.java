@@ -22,4 +22,6 @@ public interface WatchlistRepository {
     public void enableWatchlist(String name);
 
     public void disableWatchlist(String name);
+
+    public void deleteAllWatchlists();
 }

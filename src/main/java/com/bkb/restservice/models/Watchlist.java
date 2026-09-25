@@ -27,7 +27,7 @@ public class Watchlist {
      }
 
      public static WatchlistRecord toRecord( AlpacaWatchlist alpacaWatchlist){
-        return new WatchlistRecord( alpacaWatchlist.id() , alpacaWatchlist.name(), alpacaWatchlist.accountId(), List.of(), true, alpacaWatchlist.createdAt().toString(), alpacaWatchlist.updatedAt().toString());
+        return new WatchlistRecord( alpacaWatchlist.id() , alpacaWatchlist.name(), alpacaWatchlist.accountId(), List.of(), true, alpacaWatchlist.createdAt().toString().replace("T" ," ").replace("Z" , " "), alpacaWatchlist.updatedAt().toString().replace("T" ," ").replace("Z" , " "));
      }
      String getId(){
         return id;
