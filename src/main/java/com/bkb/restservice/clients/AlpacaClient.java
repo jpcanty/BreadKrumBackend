@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClient;
 
 import com.bkb.restservice.ApplicationConfiguration;
 import com.bkb.restservice.models.AlpacaWatchlist;
+import com.bkb.restservice.models.AlpacaWatchlistWithAssets;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,7 +48,7 @@ public class AlpacaClient {
         }).thenApply(this::parseListResponse);
     }
 
-    public CompletionStage<AlpacaWatchlist> getWatchlistByIdFuture(String id) {
+    public CompletionStage<AlpacaWatchlistWithAssets> getWatchlistByIdFuture(String id) {
         return CompletableFuture.supplyAsync(() -> {
             return restClient.get()
                         .uri(BASE_URL + "/" + id)
@@ -56,7 +57,7 @@ public class AlpacaClient {
                         .retrieve()
                         .body(String.class);
 
-        }).thenApply(this::parseResponse);
+        }).thenApply(this::parseResponseWithAssets);
     }
 
     // "https://data.alpaca.markets/v2/stocks/:symbol/bars?timeframe=1D"
@@ -110,6 +111,16 @@ public CompletionStage<String> getStockPriceHistoryBySymbolsFuture(Set<String> s
     AlpacaWatchlist parseResponse(String response) {
         try {
             return objectMapper.readValue(response, AlpacaWatchlist.class);
+        } catch (JsonProcessingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            throw new NullPointerException();
+        }
+    }
+
+    AlpacaWatchlistWithAssets parseResponseWithAssets(String response) {
+        try {
+            return objectMapper.readValue(response, AlpacaWatchlistWithAssets.class);
         } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
