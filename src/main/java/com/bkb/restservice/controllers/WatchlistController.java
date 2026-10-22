@@ -36,7 +36,7 @@ public class WatchlistController {
 
     // this is connected to line 18 in the SQLiteWatchlist Repository file
     @PostMapping("/watchlist")
-    public CompletionStage<String> postWatchlist(@RequestBody String entity) {
+    public CompletionStage<Void> postWatchlist(@RequestBody String entity) {
         final WatchlistRecord watchlist = buildWatchlistRequestEntity(entity);
         return watchlistService.postWatchlist(watchlist);
     }
@@ -104,7 +104,7 @@ public class WatchlistController {
     //this is the one we worked on last meeting.
     @GetMapping("watchlists/accountId")
     public CompletionStage<List<WatchlistRecord>> getWatchlistsByAccountId( @RequestParam(value = "accountId") String accountId) {
-        return watchlistService.getWatchlistByAccountId(accountId);
+        return watchlistService.getWatchlistsByAccountId(accountId);
     }
 
     @PutMapping("/watchlist/enable")
