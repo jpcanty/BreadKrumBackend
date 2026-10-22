@@ -10,6 +10,7 @@ import com.bkb.restservice.models.Watchlist;
 import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 
 import com.bkb.restservice.models.AlpacaWatchlist;
+import com.bkb.restservice.models.AlpacaWatchlistWithAssets;
 import com.bkb.restservice.models.Back4AppWatchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
 
@@ -40,7 +41,7 @@ public class WatchlistService {
         return alpacaClient.getAllWatchlistsFuture();
     }
 
-    public CompletionStage<AlpacaWatchlist> getAlpacaWatchlistById(String id) {
+    public CompletionStage<AlpacaWatchlistWithAssets> getAlpacaWatchlistById(String id) {
         return alpacaClient.getWatchlistByIdFuture(id);
     }
 

@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import com.bkb.restservice.models.AlpacaWatchlist;
+import com.bkb.restservice.models.AlpacaWatchlistWithAssets;
 import com.bkb.restservice.models.Back4AppWatchlist;
 import com.bkb.restservice.models.StockPrice;
+import com.bkb.restservice.services.StockPriceService;
 import com.bkb.restservice.services.WatchlistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +23,8 @@ public class WatchlistController {
 
     @Autowired
     private WatchlistService watchlistService;
+    @Autowired
+    private StockPriceService stockPriceService;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -54,7 +58,7 @@ public class WatchlistController {
     }
 
     @GetMapping("/watchlist/alpaca/id")
-    public CompletionStage<AlpacaWatchlist> getWatchlistById(@RequestParam(value = "id", defaultValue = "") String id) {
+    public CompletionStage<AlpacaWatchlistWithAssets> getWatchlistById(@RequestParam(value = "id", defaultValue = "") String id) {
         if (id.isBlank()) {
             throw new NullPointerException();
         }
@@ -87,10 +91,9 @@ public class WatchlistController {
 
     @GetMapping("/stockpriceSymbol")
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(
-            @RequestParam(value = "symbol", defaultValue = "") String symbol,
-            @RequestParam(value = "timeframe", defaultValue = "") String timeframe) {
-        return null;
-        // return watchlistService.getStockPriceHistoryBySymbol(symbol, timeframe);
+            @RequestParam(value = "symbol", defaultValue = "SPOT") String symbol,
+            @RequestParam(value = "timeframe", defaultValue = "1D") String timeframe) {
+        return stockPriceService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
 
     //this will be connected to line 31 in sqlitewatchlistRepository.java file
