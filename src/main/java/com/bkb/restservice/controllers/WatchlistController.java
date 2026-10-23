@@ -7,8 +7,6 @@ import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.bkb.restservice.models.AlpacaWatchlist;
-import com.bkb.restservice.models.AlpacaWatchlistWithAssets;
 import com.bkb.restservice.models.Back4AppWatchlist;
 import com.bkb.restservice.models.StockPrice;
 import com.bkb.restservice.services.StockPriceService;
@@ -68,15 +66,6 @@ public class WatchlistController {
     @DeleteMapping("watchlist/disable")
     public CompletionStage<Void> disableWatchlist(@RequestParam(value = "watchlistName") String watchlistName) {
         return watchlistService.disableWatchlist(watchlistName);
-    }
-
-    @GetMapping("watchlist/alpaca/id")
-    public CompletionStage<AlpacaWatchlistWithAssets> getWatchlistById(
-            @RequestParam(value = "id", defaultValue = "") String id) {
-        if (id.isBlank()) {
-            throw new NullPointerException();
-        }
-        return watchlistService.getAlpacaWatchlistById(id);
     }
 
     @GetMapping("watchlist/back4app/name")

@@ -26,7 +26,6 @@ public class Watchlist {
    }
 
    public static WatchlistRecord toRecord(Watchlist watchlist) {
-      System.out.println("I'm here");
       return new WatchlistRecord(watchlist.getId(), watchlist.getName(), watchlist.getAccountId(), List.of(),
             watchlist.getEnabled(), cleanTime(watchlist.getCreatedAt().toString()),
             cleanTime(watchlist.getUpdatedAt().toString()));

@@ -14,6 +14,7 @@ import com.bkb.restservice.repositories.WatchlistRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.ApplicationConfiguration;
@@ -42,10 +43,22 @@ public class WatchlistService {
     }
 
     public CompletionStage<Void> postWatchlist(WatchlistRecord watchlist) {
-        watchlistRepository.insertWatchlist(watchlist.id(), watchlist.name(), watchlist.accountId(),
-                watchlist.enabled(), Watchlist.cleanTime(watchlist.createdAt()),
-                Watchlist.cleanTime(watchlist.updatedAt()));
-        return CompletableFuture.completedFuture(null);
+        return CompletableFuture.runAsync(() -> {
+            watchlistRepository.insertWatchlist(watchlist.id(), watchlist.name(), watchlist.accountId(),
+                    watchlist.enabled(), Watchlist.cleanTime(watchlist.createdAt()),
+                    Watchlist.cleanTime(watchlist.updatedAt()));
+        });
+    }
+
+    public CompletionStage<Void> postAllWatchlists() {
+        return getAllAlpacaWatchlists().thenCompose(watchlists -> {
+            List<CompletionStage<Void>> futures = watchlists.stream()
+                    .map(Watchlist::toRecord)
+                    .map(this::postWatchlist).toList();
+
+            return CompletableFuture
+                    .allOf(futures.toArray(new CompletableFuture[0]));
+        });
     }
 
     public CompletionStage<List<AlpacaWatchlist>> getAllAlpacaWatchlists() {
@@ -59,17 +72,6 @@ public class WatchlistService {
     public CompletionStage<Back4AppWatchlist> getWatchlistObjectId(String watchlistName) {
         return back4AppClient.getWatchlistObjectId(watchlistName).thenApply(response -> {
             return response.results().stream().findAny().orElseThrow();
-        });
-    }
-
-    public CompletionStage<Void> postAllWatchlists() {
-        return getAllAlpacaWatchlists().thenCompose(watchlists -> {
-            List<CompletionStage<Void>> futures = watchlists.stream()
-                    .map(Watchlist::toRecord)
-                    .map(this::postWatchlist).toList();
-
-            return CompletableFuture
-                    .allOf(futures.toArray(new CompletableFuture[0]));
         });
     }
 

@@ -1,13 +1,8 @@
 package com.bkb.restservice.repositories;
 
 import java.util.List;
-import java.util.concurrent.CompletionStage;
-
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.bkb.restservice.models.Watchlist;
-import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 
 public interface WatchlistRepository {
     public void insertWatchlist(String id, String name, String accountId, boolean enabled, String createdAt,

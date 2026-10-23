@@ -1,12 +1,9 @@
 package com.bkb.restservice.repositories;
 
 import com.bkb.restservice.models.Watchlist;
-import com.bkb.restservice.models.Watchlist.WatchlistRecord;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 
 public class DummyWatchlistRepository implements WatchlistRepository {
 
