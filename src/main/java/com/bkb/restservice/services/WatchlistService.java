@@ -68,7 +68,7 @@ public class WatchlistService {
                 .thenApply(WatchlistService::toRecords);
     }
 
-    public CompletionStage<List<WatchlistRecord>> getAllWatchlists(){
+    public CompletionStage<List<WatchlistRecord>> getAllWatchlists() {
         return CompletableFuture.supplyAsync(() -> watchlistRepository.getAllWatchlists())
                 .thenApply(WatchlistService::toRecords);
 
@@ -79,21 +79,22 @@ public class WatchlistService {
     }
 
     public CompletionStage<String> postWatchlist(WatchlistRecord watchlist) {
-            watchlistRepository.insertWatchlist(watchlist.id() , watchlist.name(), watchlist.accountId(), watchlist.enabled(), watchlist.createdAt(), watchlist.updatedAt());
-            return CompletableFuture.completedFuture("");
+        watchlistRepository.insertWatchlist(watchlist.id(), watchlist.name(), watchlist.accountId(),
+                watchlist.enabled(), watchlist.createdAt(), watchlist.updatedAt());
+        return CompletableFuture.completedFuture("");
 
     }
 
     public CompletionStage<Void> postAllWatchlists() {
-            return getAllAlpacaWatchlists().thenCompose( watchlists-> {
-                List<CompletionStage<String>> futures = watchlists.stream()
-                        .map( Watchlist ::toRecord)
-                        .map(this::postWatchlist ).toList();
+        return getAllAlpacaWatchlists().thenCompose(watchlists -> {
+            List<CompletionStage<String>> futures = watchlists.stream()
+                    .map(Watchlist::toRecord)
+                    .map(this::postWatchlist).toList();
 
-                return CompletableFuture
+            return CompletableFuture
                     .allOf(futures.toArray(new CompletableFuture[0]));
 
-            });
+        });
 
     }
 
@@ -113,29 +114,34 @@ public class WatchlistService {
 
     public CompletionStage<Void> enableWatchlist(String watchlistName) {
         watchlistRepository.enableWatchlist(watchlistName);
-        return CompletableFuture.completedFuture(null ).thenAccept(response -> {});
-//        return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {
-//        });
+        return CompletableFuture.completedFuture(null).thenAccept(response -> {
+        });
+        // return back4AppClient.enableWatchlist(watchlistName).thenAccept(response -> {
+        // });
     }
 
     public CompletionStage<Void> disableWatchlist(String watchlistName) {
 
         watchlistRepository.disableWatchlist(watchlistName);
-        return CompletableFuture.completedFuture(null).thenAccept(response -> {});
+        return CompletableFuture.completedFuture(null).thenAccept(response -> {
+        });
 
     }
 
     public CompletionStage<String> getWatchlistIdByName(String watchlistName) {
         // watchlist response is coming from back4appclient
-//        Optional<Back4AppWatchlist> watchlistObjectId = back4AppClient.getAllEnabledWatchlists().results().stream()
-//                .filter(watchlist -> {
-//                    String name = watchlist.name();
-//                    return name.equals(watchlistName);
-//                }).findAny();
-//        String objectId = watchlistObjectId.orElseThrow().objectId();
-//
-//        return objectId;
-        return watchlistRepository.getWatchlistByIdName(watchlistName).thenApply(WatchlistRecord::id);
+        // Optional<Back4AppWatchlist> watchlistObjectId =
+        // back4AppClient.getAllEnabledWatchlists().results().stream()
+        // .filter(watchlist -> {
+        // String name = watchlist.name();
+        // return name.equals(watchlistName);
+        // }).findAny();
+        // String objectId = watchlistObjectId.orElseThrow().objectId();
+        //
+        // return objectId;
+        return CompletableFuture.supplyAsync(() -> watchlistRepository.getWatchlistsByIdName(watchlistName))
+                .thenApply(watchlists -> watchlists.stream().findAny().map(Watchlist::toRecord).map(WatchlistRecord::id)
+                        .orElse("NOT_FOUND"));
     }
 
     public CompletionStage<List<WatchlistRecord>> getWatchlistByAccountId(String accountId) {

@@ -17,8 +17,8 @@ public class DummyWatchlistRepository implements WatchlistRepository{
     }
 
     @Override
-    public CompletionStage<Watchlist.WatchlistRecord> getWatchlistByIdName(String name) {
-        return null;
+    public List<Watchlist> getWatchlistsByIdName(String name) {
+        return List.of();
     }
 
     @Override

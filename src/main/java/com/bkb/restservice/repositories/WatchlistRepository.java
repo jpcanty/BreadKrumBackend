@@ -12,7 +12,7 @@ public interface WatchlistRepository {
     
     public List<Watchlist> getAllWatchlists();
 
-    public CompletionStage<WatchlistRecord> getWatchlistByIdName(String name);
+    public List<Watchlist> getWatchlistsByIdName(String name);
 
     public List<Watchlist> getWatchlistsByAccountId(String accountId);
 
