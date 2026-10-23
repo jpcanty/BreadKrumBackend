@@ -98,8 +98,8 @@ public class WatchlistController {
 
     //this will be connected to line 31 in sqlitewatchlistRepository.java file
     @GetMapping("/watchlist/getWatchlistByIdName")
-    public String getWatchlistByIdName(@RequestParam(value = "name") String watchlistName) {
-        return watchlistService.getWatchlistIdByName(watchlistName).toString();
+    public CompletionStage<String> getWatchlistByIdName(@RequestParam(value = "name") String watchlistName) {
+        return watchlistService.getWatchlistIdByName(watchlistName);
     }
     //this is the one we worked on last meeting.
     @GetMapping("watchlists/accountId")

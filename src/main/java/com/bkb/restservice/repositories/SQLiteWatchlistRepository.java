@@ -45,7 +45,7 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
 
     @Override
     @Query("SELECT b FROM Watchlist b WHERE b.name = :name")
-    public CompletionStage<WatchlistRecord> getWatchlistByIdName(@Param( "name") String name);
+    public List<Watchlist> getWatchlistsByIdName(@Param( "name") String name);
 
     @Override
     @Query("SELECT b FROM Watchlist b WHERE b.enabled =  true")

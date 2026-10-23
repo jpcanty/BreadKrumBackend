@@ -97,7 +97,9 @@ public class WatchlistService {
     }
 
     public CompletionStage<String> getWatchlistIdByName(String watchlistName) {
-        return watchlistRepository.getWatchlistByIdName(watchlistName).thenApply(WatchlistRecord::id);
+        return CompletableFuture.supplyAsync(() -> watchlistRepository.getWatchlistsByIdName(watchlistName))
+                .thenApply(watchlists -> watchlists.stream().findAny().map(Watchlist::toRecord).map(WatchlistRecord::id)
+                        .orElse("NOT_FOUND"));
     }
 
     public CompletionStage<List<WatchlistRecord>> getWatchlistsByAccountId(String accountId) {
