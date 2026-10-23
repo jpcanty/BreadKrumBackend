@@ -43,7 +43,8 @@ public class WatchlistService {
 
     public CompletionStage<Void> postWatchlist(WatchlistRecord watchlist) {
         watchlistRepository.insertWatchlist(watchlist.id(), watchlist.name(), watchlist.accountId(),
-                watchlist.enabled(), watchlist.createdAt(), watchlist.updatedAt());
+                watchlist.enabled(), Watchlist.cleanTime(watchlist.createdAt()),
+                Watchlist.cleanTime(watchlist.updatedAt()));
         return CompletableFuture.completedFuture(null);
     }
 
@@ -58,18 +59,6 @@ public class WatchlistService {
     public CompletionStage<Back4AppWatchlist> getWatchlistObjectId(String watchlistName) {
         return back4AppClient.getWatchlistObjectId(watchlistName).thenApply(response -> {
             return response.results().stream().findAny().orElseThrow();
-        });
-    }
-
-    public CompletionStage<List<AlpacaWatchlist>> getAlpacaWatchlistsByParam(List<String> params) {
-        return getAllAlpacaWatchlists().thenApply(watchlists -> {
-            return watchlists.stream()
-                    .filter(watchlist -> {
-                        boolean hasName = params.contains(watchlist.name());
-                        boolean hasID = params.contains(watchlist.id());
-                        return hasName || hasID;
-                    })
-                    .toList();
         });
     }
 
@@ -104,9 +93,7 @@ public class WatchlistService {
 
     public CompletionStage<List<WatchlistRecord>> getWatchlistsByAccountId(String accountId) {
         return CompletableFuture.completedFuture(watchlistRepository.getWatchlistsByAccountId(accountId))
-                .thenApply(watchlist -> {
-                    return watchlist.stream().map(Watchlist::toRecord).toList();
-                });
+                .thenApply(WatchlistService::toRecords);
     }
 
     private static List<WatchlistRecord> toRecords(List<Watchlist> watchlists) {
