@@ -1,19 +1,23 @@
 package com.bkb.restservice.repositories;
 
 import com.bkb.restservice.models.Watchlist;
-import org.springframework.data.repository.query.Param;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 
-public class DummyWatchlistRepository implements WatchlistRepository{
+public class DummyWatchlistRepository implements WatchlistRepository {
+
+    List<Watchlist> watchlists = new ArrayList<>();
+
     @Override
-    public void insertWatchlist(String id ,String name,  String accountId, boolean enabled, String createdAt, String updatedAt) {
+    public void insertWatchlist(String id, String name, String accountId, boolean enabled, String createdAt,
+            String updatedAt) {
+        watchlists.add(new Watchlist());
     }
 
     @Override
     public List<Watchlist> getAllWatchlists() {
-        return List.of();
+        return watchlists;
     }
 
     @Override
@@ -23,16 +27,19 @@ public class DummyWatchlistRepository implements WatchlistRepository{
 
     @Override
     public List<Watchlist> getWatchlistsByAccountId(String accountId) {
-        return List.of();
+        return watchlists;
     }
 
     @Override
     public List<Watchlist> getEnabledWatchlists() {
-        return List.of();
+        return watchlists;
     }
 
     @Override
     public void enableWatchlist(String name) {
     }
-    public void disableWatchlist(String name){};
+
+    @Override 
+    public void disableWatchlist(String name) {
+    };
 }

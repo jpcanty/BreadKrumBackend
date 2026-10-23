@@ -2,7 +2,7 @@ package com.bkb.restservice.repositories;
 
 import com.bkb.restservice.ApplicationConfiguration;
 import com.bkb.restservice.models.Watchlist;
-import com.bkb.restservice.models.Watchlist.WatchlistRecord;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.CompletionStage;
-
 
 @Component(ApplicationConfiguration.SQLITE_RESPOSITORY)
 public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepository<Watchlist, String> {
@@ -20,7 +18,9 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
     @Modifying
     @Transactional
     @Query("INSERT INTO Watchlist (id, name, accountId , enabled, createdAt, updatedAt ) VALUES(:id, :name , :accountId , :enabled, :createdAt,:updatedAt)")
-    public void insertWatchlist(@Param("id")String id ,@Param("name") String name, @Param("accountId") String accountId,@Param("enabled") boolean enabled, @Param("createdAt") String createdAt, @Param("updatedAt")String updatedAt);
+    public void insertWatchlist(@Param("id") String id, @Param("name") String name,
+            @Param("accountId") String accountId, @Param("enabled") boolean enabled,
+            @Param("createdAt") String createdAt, @Param("updatedAt") String updatedAt);
 
     @Override
     @Modifying
@@ -38,9 +38,8 @@ public interface SQLiteWatchlistRepository extends WatchlistRepository, JpaRepos
     @Query("SELECT b FROM Watchlist b")
     public List<Watchlist> getAllWatchlists();
 
-
     @Override
-    @Query ("SELECT b FROM Watchlist b WHERE b.accountId = :accountId")
+    @Query("SELECT b FROM Watchlist b WHERE b.accountId = :accountId")
     public List<Watchlist> getWatchlistsByAccountId(@Param("accountId") String accountId);
 
     @Override
