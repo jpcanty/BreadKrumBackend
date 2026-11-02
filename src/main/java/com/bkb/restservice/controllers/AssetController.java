@@ -16,7 +16,7 @@ public class AssetController {
     
     @GetMapping("asset/price")
     public CompletionStage<StockPrice> getStockPriceHistoryBySymbol(
-            @RequestParam(value = "symbol", defaultValue = "SPOT") String symbol,
+            @RequestParam(value = "symbol", defaultValue = "GOOG") String symbol,
             @RequestParam(value = "timeframe", defaultValue = "1D") String timeframe) {
         return stockPriceService.getStockPriceHistoryBySymbol(symbol, timeframe);
     }
