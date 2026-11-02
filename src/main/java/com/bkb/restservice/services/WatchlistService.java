@@ -14,7 +14,6 @@ import com.bkb.restservice.repositories.WatchlistRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.bkb.restservice.ApplicationConfiguration;

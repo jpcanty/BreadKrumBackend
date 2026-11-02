@@ -31,7 +31,7 @@ public class Back4AppClient {
     private static final String BACK_4_APP_APPLICATION_ID = "19FwHl4gMBw72qM8OHaGyCgm038AjHznnh4E5Wmz";
     private static final String BACK_4_APP_REST_API_KEY = "URGqznPEwDMGaPmkyCJMbx7SCtvCOfDWPlvp26gF";
     private static final String ENABLED_WATCHLIST_TABLE = "EnabledWatchlists";
-    private static final String WATCCHLIST_TABLE = "Watchlist3";    
+    private static final String WATCCHLIST_TABLE = "Watchlist3";
 
     public CompletionStage<Back4AppWatchlistsResponse> getWatchlistObjectId(String watchlistName) {
         return CompletableFuture.supplyAsync(() -> {
@@ -80,10 +80,6 @@ public class Back4AppClient {
                     .body(String.class); // the response is in a String
         });
     }
-
-    // We want to write a row to a table with a POST
-    // Name of the table: EnabledWatchlists
-    // {"name":"Shoes"}
 
     public CompletionStage<ResponseEntity<Void>> enableWatchlist(String watchlistName) {
         return CompletableFuture.supplyAsync(() -> {

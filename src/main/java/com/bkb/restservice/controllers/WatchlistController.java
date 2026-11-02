@@ -14,7 +14,6 @@ import com.bkb.restservice.services.WatchlistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-// Controller is the entry into the backend service 
 @RestController
 @CrossOrigin(origins = "http://localhost:8080")
 public class WatchlistController {

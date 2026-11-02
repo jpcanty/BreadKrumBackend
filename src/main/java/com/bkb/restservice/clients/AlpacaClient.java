@@ -36,71 +36,69 @@ public class AlpacaClient {
 
     private static final String DATA_BASE_URL = "https://data.alpaca.markets/v2/stocks";
 
-
     public CompletionStage<List<AlpacaWatchlist>> getAllWatchlistsFuture() {
         return CompletableFuture.supplyAsync(() -> {
             return restClient.get()
-                        .uri(BASE_URL)
-                        .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
-                        .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
-                        .retrieve()
-                        .body(String.class);
+                    .uri(BASE_URL)
+                    .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
+                    .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
+                    .retrieve()
+                    .body(String.class);
         }).thenApply(this::parseListResponse);
     }
 
     public CompletionStage<AlpacaWatchlistWithAssets> getWatchlistByIdFuture(String id) {
         return CompletableFuture.supplyAsync(() -> {
             return restClient.get()
-                        .uri(BASE_URL + "/" + id)
-                        .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
-                        .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
-                        .retrieve()
-                        .body(String.class);
+                    .uri(BASE_URL + "/" + id)
+                    .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
+                    .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
+                    .retrieve()
+                    .body(String.class);
 
         }).thenApply(this::parseResponseWithAssets);
     }
 
-    // "https://data.alpaca.markets/v2/stocks/:symbol/bars?timeframe=1D"
-
     public CompletionStage<String> getStockPriceHistoryBySymbolFuture(String symbol, String timeframe) {
         return CompletableFuture.supplyAsync(() -> {
             return restClient.get().uri(DATA_BASE_URL + "/" + symbol + "/bars?timeframe=" + timeframe)
-            .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
-            .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
-            .retrieve()
-            .body(String.class);
+                    .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
+                    .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
+                    .retrieve()
+                    .body(String.class);
         });
     }
 
-public CompletionStage<String> getStockPriceHistoryBySymbolsFuture(Set<String> symbols, String timeframe) {
-    // Determine last weekday
-    ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-    DayOfWeek day = now.getDayOfWeek();
-    if (day == DayOfWeek.SATURDAY) {
-        now = now.minusDays(1); // Friday
-    } else if (day == DayOfWeek.SUNDAY) {
-        now = now.minusDays(2); // Friday
-    }
+    public CompletionStage<String> getStockPriceHistoryBySymbolsFuture(Set<String> symbols, String timeframe) {
+        // Determine last weekday
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        DayOfWeek day = now.getDayOfWeek();
+        if (day == DayOfWeek.SATURDAY) {
+            now = now.minusDays(1); // Friday
+        } else if (day == DayOfWeek.SUNDAY) {
+            now = now.minusDays(2); // Friday
+        }
 
-    // Format as ISO 8601
-    String lastWeekday = now.toLocalDate().atStartOfDay(ZoneOffset.UTC)
-            .format(DateTimeFormatter.ISO_INSTANT);
+        // Format as ISO 8601
+        String lastWeekday = now.toLocalDate().atStartOfDay(ZoneOffset.UTC)
+                .format(DateTimeFormatter.ISO_INSTANT);
 
-    return CompletableFuture.supplyAsync(() -> {
-        return restClient.get()
-            .uri(DATA_BASE_URL + "/bars?symbols=" + String.join(",", symbols)
-                 + "&timeframe=" + timeframe
-                 + "&start=" + lastWeekday)
-            .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
-            .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
-            .retrieve()
-            .body(String.class);
+        return CompletableFuture.supplyAsync(() -> {
+            return restClient.get()
+                    .uri(DATA_BASE_URL + "/bars?symbols=" + String.join(",", symbols)
+                            + "&timeframe=" + timeframe
+                            + "&start=" + lastWeekday)
+                    .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
+                    .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
+                    .retrieve()
+                    .body(String.class);
         });
     }
 
     List<AlpacaWatchlist> parseListResponse(String response) {
         try {
-            return objectMapper.readValue(response, new TypeReference<List<AlpacaWatchlist>>(){});
+            return objectMapper.readValue(response, new TypeReference<List<AlpacaWatchlist>>() {
+            });
         } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
