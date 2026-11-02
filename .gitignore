@@ -3,4 +3,5 @@
 .vs_code/
 .idea
 build
+database.db
 bin

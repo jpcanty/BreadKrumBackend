@@ -2,6 +2,7 @@ package com.bkb.restservice.services;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 
 import com.bkb.restservice.models.Watchlist;
@@ -12,10 +13,15 @@ import com.bkb.restservice.models.AlpacaWatchlistWithAssets;
 import com.bkb.restservice.models.Back4AppWatchlist;
 import com.bkb.restservice.repositories.WatchlistRepository;
 
+import org.hibernate.exception.GenericJDBCException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.http.HttpStatus;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
 
 import com.bkb.restservice.ApplicationConfiguration;
 import com.bkb.restservice.clients.AlpacaClient;
@@ -41,11 +47,35 @@ public class WatchlistService {
                 .thenApply(WatchlistService::toRecords);
 
     }
-
+    
     public CompletionStage<Void> postWatchlist(WatchlistRecord watchlist) {
+        return insertWatchlistAsync(watchlist)
+                .exceptionallyCompose(ex -> {
+                    if (isDuplicatePrimaryKey(ex)) {
+                        return CompletableFuture.failedStage(new ResponseStatusException(
+                                HttpStatus.CONFLICT,
+                                "Watchlist already exists"));
+                    }
+                    return CompletableFuture.failedStage(ex);
+                });
+    }
+
+    private boolean isDuplicatePrimaryKey(Throwable ex) {
+        return ex instanceof CompletionException
+                && ex.getCause() instanceof JpaSystemException jpaException
+                && jpaException.getCause() instanceof GenericJDBCException jdbcException
+                && jdbcException.getCause() instanceof SQLiteException sqliteException
+                && sqliteException.getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_PRIMARYKEY;
+    }
+
+    private CompletableFuture<Void> insertWatchlistAsync(WatchlistRecord watchlist) {
         return CompletableFuture.runAsync(() -> {
-            watchlistRepository.insertWatchlist(watchlist.id(), watchlist.name(), watchlist.accountId(),
-                    watchlist.enabled(), Watchlist.cleanTime(watchlist.createdAt()),
+            watchlistRepository.insertWatchlist(
+                    watchlist.id(),
+                    watchlist.name(),
+                    watchlist.accountId(),
+                    watchlist.enabled(),
+                    Watchlist.cleanTime(watchlist.createdAt()),
                     Watchlist.cleanTime(watchlist.updatedAt()));
         });
     }
