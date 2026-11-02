@@ -1,15 +1,13 @@
-# BreadKrumb Backend
+# BreadKrumB(ackend)
 
-BreadKrumb creates clusters around user selected assets.
+BreadKrumB is a data layer that sources from Alpaca and Back4App. It replicates watchlist and asset data into a local SQLite instance
 
 The app uses:
 ### Alpaca
 - Free API for market data and creating watchlists
 ### Back4App
 - Free backend as a service, that handles user data, sessions and custom objects
-- Back4App stores data and serves the BreadKrumWeb
-### Back4App
-- Website that reads from Back4App to show watclists and position breakdown
+- Back4App stores auxilliary data and serves BreadKrumWeb
   
 ## Installation 
 Follow the instructions to install [Springboot](https://docs.spring.io/spring-boot/installing.html) 
@@ -25,32 +23,11 @@ Make sure you have `curl` installed
 
 ### GetAllWatchlist
 ```
-curl "localhost:8080/watchlists
-```
-
-### GetWatchlistById
-Change id to id retrieved in Alpaca 
-```
-curl "localhost:8080/watchlistID?id={id}
+curl "localhost:8080/watchlists/all"
 ```
 
 ### PostWatchlist
 Example call
 ```
-curl --location 'localhost:8080/watchlists' \
---header 'Content-Type: application/json' \
---data '{
-    "name": "Name",
-    "assets": [
-        {
-            "symbol": "S"
-        },
-        {
-            "symbol": "E"
-        },
-        {
-            "symbol": "T"
-        }
-    ]
-}'
+curl -X POST "localhost:8080/watchlist" -H "Content-Type: application/json" -d '{"id":"ee73d4ac-7c7a-406d-ab2c-e7d66ce8c21b","name":"TestWatchlist","accountId":"test-account-003","assets":[],"enabled":true,"createdAt":"2023-10-22 18:00:00.0","updatedAt":"2023-10-22 18:00:00.0"}'
 ```
