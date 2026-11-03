@@ -4,4 +4,5 @@
 .idea
 build
 database.db
+database.sqbpro
 bin

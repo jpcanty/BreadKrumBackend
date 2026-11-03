@@ -59,16 +59,6 @@ public class AlpacaClient {
         }).thenApply(this::parseResponseWithAssets);
     }
 
-    public CompletionStage<String> getStockPriceHistoryBySymbolFuture(String symbol, String timeframe) {
-        return CompletableFuture.supplyAsync(() -> {
-            return restClient.get().uri(DATA_BASE_URL + "/" + symbol + "/bars?timeframe=" + timeframe)
-                    .header("APCA-API-KEY-ID", APCA_API_KEY_ID)
-                    .header("APCA-API-SECRET-KEY", APCA_API_SECRET_KEY)
-                    .retrieve()
-                    .body(String.class);
-        });
-    }
-
     public CompletionStage<String> getStockPriceHistoryBySymbolsFuture(Set<String> symbols, String timeframe) {
         // Determine last weekday
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
